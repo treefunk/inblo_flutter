@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:inblo_app/constants/app_theme.dart';
 
-class InbloTextButton extends StatelessWidget {
+class InbloTextButton extends StatefulWidget {
   final String title;
   final void Function() onPressed;
 
@@ -10,32 +11,38 @@ class InbloTextButton extends StatelessWidget {
   });
 
   @override
+  State<InbloTextButton> createState() => _InbloTextButtonState();
+}
+
+class _InbloTextButtonState extends State<InbloTextButton> {
+  @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: onPressed,
-      style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-            side: BorderSide(color: Color(0xFF328ED1), width: 1),
+    return Ink(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Color(0xFF1E47D3),
+            offset: Offset(0, 5),
           ),
-        ),
-        backgroundColor: MaterialStateProperty.all(
-          Color(0xFF2B57EA),
-        ),
-        foregroundColor: MaterialStateProperty.all(Colors.white),
+        ],
+        border: Border.all(color: Color(0xFF328ED1), width: 1),
+        color: Color(0xFF2B57EA),
+        borderRadius: BorderRadius.circular(28),
       ),
-      child: Container(
-        width: double.infinity,
-        alignment: Alignment.center,
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
+      child: InkWell(
+        splashColor: themeData.colorScheme.primary,
+        borderRadius: BorderRadius.circular(28),
+        onTap: () {},
+        child: Container(
+          padding: EdgeInsets.all(10),
+          width: double.infinity,
+          alignment: Alignment.center,
           child: Text(
-            title,
+            widget.title,
             style: TextStyle(
-              fontWeight: FontWeight.normal,
+              fontFamily: "Hiragino",
+              color: Colors.white,
               fontSize: 16,
-              letterSpacing: 2.5,
             ),
           ),
         ),

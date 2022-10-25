@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:inblo_app/features/auth/presentation/sign_in_screen.dart';
 
 import './constants/app_theme.dart' as app_theme;
 
@@ -6,6 +8,11 @@ import './common_widgets/inblo_text_field.dart';
 import './common_widgets/inblo_text_button.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(const MyApp());
 }
 
@@ -18,29 +25,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: app_theme.themeData,
-      home: Scaffold(
-        body: Container(
-          margin: EdgeInsets.all(10),
-          child: Column(
-            children: [
-              InbloTextField(
-                textHint: "ユーザー名",
-              ),
-              SizedBox(height: 10),
-              InbloTextField(
-                textHint: "パスワード",
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              InbloTextButton(
-                onPressed: () {},
-                title: "登録",
-              )
-            ],
-          ),
-        ),
-      ),
+      home: SignInScreen(),
     );
   }
 }

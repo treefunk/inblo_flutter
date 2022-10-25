@@ -10,7 +10,11 @@ class InbloTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      style: TextStyle(color: Colors.black),
+      style: TextStyle(
+        color: Colors.black,
+        fontSize: 16,
+        fontFamily: "Hiragino",
+      ),
       decoration: InputDecoration(
         labelText: textHint,
         labelStyle: TextStyle(
@@ -19,7 +23,8 @@ class InbloTextField extends StatelessWidget {
           letterSpacing: 3,
         ),
         floatingLabelStyle: TextStyle(
-          color: Color(0xFF2F2525),
+          // color: Color(0xFF2F2525),
+          color: themeData.primaryColor,
           fontFamily: "Hiragino",
           letterSpacing: 3,
         ),
