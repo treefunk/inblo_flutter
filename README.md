@@ -15,12 +15,14 @@
   <p align="center">
     Flutter project for managing horses and trainers
     <br />
+    
  
-    <a href="https://github.com/treefunk/inblo_flutter/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/treefunk/inblo_flutter/issues">Request Feature</a>
+   
   </p>
 </div>
-
-
+<div align="center">
+ <a href="https://github.com/treefunk/inblo_flutter/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/treefunk/inblo_flutter/issues">Request Feature</a>
+</div>
 
