@@ -44,15 +44,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Expanded(
-                        flex: 0,
-                        child: Text(
-                          "役割は？",
-                          style: loginCaptionGrey,
-                        )),
+                    Text(
+                      "役割は？",
+                      style: loginCaptionGrey,
+                    ),
                     Expanded(
                       child: ListTile(
-                        title: const Text('調教師'),
+                        title: const Text(
+                          '調教師',
+                          style: TextStyle(fontFamily: "Roboto", fontSize: 16),
+                        ),
                         leading: Radio<Role>(
                           value: Role.trainer,
                           groupValue: _selectedRole,
@@ -66,7 +67,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     Expanded(
                       child: ListTile(
-                        title: const Text('担当者'),
+                        title: const Text('担当者',
+                            style:
+                                TextStyle(fontFamily: "Roboto", fontSize: 16)),
                         leading: Radio<Role>(
                           value: Role.manager,
                           groupValue: _selectedRole,

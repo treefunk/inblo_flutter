@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:inblo_app/features/auth/presentation/sign_in_screen.dart';
+import 'package:inblo_app/features/dashboard/main_dashboard_screen.dart';
 
 import './constants/app_theme.dart' as app_theme;
 
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: app_theme.themeData,
-      home: SignInScreen(),
+      home: MainDashboardScreen(),
     );
   }
 }
