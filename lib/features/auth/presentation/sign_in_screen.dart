@@ -47,6 +47,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 InbloTextButton(
                   onPressed: () {},
                   title: "サインイン",
+                  textStyle: TextStyleInbloButton.big,
                 ),
                 SizedBox(height: 16),
                 GestureDetector(

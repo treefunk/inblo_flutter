@@ -120,6 +120,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 InbloTextButton(
                   onPressed: () {},
                   title: "登録", // register button
+                  textStyle: TextStyleInbloButton.big,
                 ),
                 SizedBox(height: 16),
                 Row(

@@ -32,6 +32,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_svg: ^1.1.6
+  flutter_slidable: ^2.0.0
+  
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -70,6 +72,8 @@ flutter:
     - assets/svg/calendar.svg
     - assets/svg/horse-list.svg
     - assets/svg/messages.svg
+    - assets/svg/ic-horse.svg
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

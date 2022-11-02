@@ -26,3 +26,17 @@ const bottomNavTxtStyle = TextStyle(
   color: colorPrimaryDark,
   fontSize: 13,
 );
+
+const buttonBigTxtStyle = TextStyle(
+  fontFamily: "Hiragino",
+  color: Colors.white,
+  fontSize: 16,
+);
+
+const buttonMediumTxtStyle = TextStyle(
+  fontFamily: "Roboto",
+  // fontWeight: FontWeight.bold,
+  color: Colors.white,
+  letterSpacing: 1.4,
+  fontSize: 12,
+);
