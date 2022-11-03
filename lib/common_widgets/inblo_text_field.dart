@@ -4,8 +4,9 @@ import '../constants/app_theme.dart';
 
 class InbloTextField extends StatelessWidget {
   String textHint;
+  int maxLines;
 
-  InbloTextField({this.textHint = "ーxーxーxー"});
+  InbloTextField({this.textHint = "ーxーxーxー", this.maxLines = 1});
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +18,7 @@ class InbloTextField extends StatelessWidget {
       ),
       decoration: InputDecoration(
         labelText: textHint,
+        alignLabelWithHint: true,
         labelStyle: TextStyle(
           color: Color(0xFFA8A8A8),
           fontFamily: "Hiragino",
@@ -41,6 +43,9 @@ class InbloTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
         ),
       ),
+      maxLines: maxLines,
+      // textAlign: TextAlign.left,
+      // textAlignVertical: TextAlignVertical.top,
     );
   }
 }

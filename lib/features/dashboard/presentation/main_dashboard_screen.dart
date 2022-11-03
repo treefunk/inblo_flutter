@@ -5,8 +5,8 @@ import 'package:flutter_svg/parser.dart';
 import 'package:inblo_app/constants/app_theme.dart';
 import 'package:inblo_app/features/auth/presentation/sign_in_screen.dart';
 import 'package:inblo_app/features/auth/presentation/sign_up_screen.dart';
-import 'package:inblo_app/features/dashboard/widgets/inblo_app_bar.dart';
-import 'package:inblo_app/features/dashboard/widgets/side_navigation_drawer.dart';
+import 'package:inblo_app/features/dashboard/presentation/widgets/inblo_app_bar.dart';
+import 'package:inblo_app/features/dashboard/presentation/widgets/side_navigation_drawer.dart';
 import 'package:inblo_app/features/horse_list/presentation/horse_list_screen.dart';
 
 // import '../auth/presentation/sign_up_screen.dart';
