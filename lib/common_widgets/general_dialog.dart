@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:inblo_app/common_widgets/inblo_text_button.dart';
-import 'package:inblo_app/common_widgets/inblo_text_field.dart';
+
 import 'package:inblo_app/constants/app_theme.dart';
 
 void showCustomDialog({
