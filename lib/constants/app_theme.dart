@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 const colorPrimary = Color(0xFF3E5EC6);
 const colorPrimaryDark = Color(0xFF202842);
 
+const colorDarkBackground = Color(0xFFC9CFD8);
+
 const bigButtonColor = Color(0xFF2B57EA);
+
+const colorAgeBackground = Color(0xFF9B4F1D);
 
 final themeData = ThemeData(
   primaryColor: colorPrimary,

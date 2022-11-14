@@ -1,25 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_svg/parser.dart';
 
 import 'package:inblo_app/constants/app_theme.dart';
-import 'package:inblo_app/features/auth/presentation/sign_in_screen.dart';
-import 'package:inblo_app/features/auth/presentation/sign_up_screen.dart';
+import 'package:inblo_app/features/calendar/presentation/calendar_screen.dart';
 import 'package:inblo_app/features/dashboard/presentation/widgets/inblo_app_bar.dart';
 import 'package:inblo_app/features/dashboard/presentation/widgets/side_navigation_drawer.dart';
 import 'package:inblo_app/features/horse_list/presentation/horse_list_screen.dart';
+import 'package:inblo_app/features/messages/presentation/messages_screen.dart';
 
 // import '../auth/presentation/sign_up_screen.dart';
 
+enum DashboardTab {
+  calendar(0),
+  horseList(1),
+  messageList(2);
+
+  final int pageNum;
+  const DashboardTab(this.pageNum);
+
+  static DashboardTab createFromInt(int pageNum) {
+    DashboardTab selected = DashboardTab.horseList;
+    if (pageNum == 0) {
+      selected = DashboardTab.calendar;
+    } else if (pageNum == 1) {
+      selected = DashboardTab.horseList;
+    } else if (pageNum == 2) {
+      selected = DashboardTab.messageList;
+    }
+    return selected;
+  }
+}
+
 class MainDashboardScreen extends StatefulWidget {
-  MainDashboardScreen({super.key});
+  DashboardTab preSelectedTab;
+  MainDashboardScreen({this.preSelectedTab = DashboardTab.horseList});
 
   @override
   State<MainDashboardScreen> createState() => _MainDashboardScreenState();
 }
 
 class _MainDashboardScreenState extends State<MainDashboardScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   late List<Map<String, Object>> _pages;
 
@@ -33,21 +54,24 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
 
   @override
   void initState() {
-    _selectedPageIndex = 0;
+    _selectedPageIndex = widget.preSelectedTab.pageNum;
     _pages = [
       {
-        'page': SignInScreen(),
-        'title': 'Categories',
+        'page': CalendarScreen(),
+        'title': 'Calendar',
       },
       {
-        'page': HorseListScreen(),
-        'title': 'Favorites',
+        'page': HorseListScreen(
+          navigatorKey: GlobalKey<NavigatorState>(),
+        ),
+        'title': 'Horse List',
       },
       {
-        'page': SignUpScreen(),
-        'title': 'Favorites',
+        'page': MessagesScreen(),
+        'title': 'Calendar',
       }
     ];
+    // _selectedPageIndex = widget.preSelectedIndex;
     super.initState();
   }
 
@@ -55,7 +79,11 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      body: _pages[_selectedPageIndex]['page'] as Widget,
+      // body: _pages[_selectedPageIndex]['page'] as Widget,
+      body: IndexedStack(
+        index: _selectedPageIndex,
+        children: _pages.map((page) => page['page'] as Widget).toList(),
+      ),
       appBar: InbloAppBar(scaffoldKey: _scaffoldKey),
       endDrawer: SideNavigationDrawer(),
       bottomNavigationBar: BottomNavigationBar(

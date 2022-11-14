@@ -34,6 +34,7 @@ void showCustomDialog({
                   child: Material(
                     type: MaterialType.transparency,
                     child: Column(
+                      mainAxisSize: MainAxisSize.max,
                       children: [
                         Padding(
                           padding:

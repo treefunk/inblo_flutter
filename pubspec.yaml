@@ -33,6 +33,10 @@ dependencies:
     sdk: flutter
   flutter_svg: ^1.1.6
   flutter_slidable: ^2.0.0
+  beamer: ^1.5.3
+  linked_scroll_controller: ^0.2.0
+  flutter_picker: ^2.0.5
+
   
 
 
@@ -74,6 +78,14 @@ flutter:
     - assets/svg/messages.svg
     - assets/svg/ic-horse.svg
     - assets/svg/ic-close.svg
+    - assets/svg/ic-condition.svg
+    - assets/svg/ic-condition-active.svg
+    - assets/svg/ic-treatment.svg
+    - assets/svg/ic-treatment-active.svg
+    - assets/svg/ic-calendar.svg
+    - assets/svg/ic-calendar-active.svg
+    
+
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

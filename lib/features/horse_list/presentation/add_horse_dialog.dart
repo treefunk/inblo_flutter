@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_picker/flutter_picker.dart';
+
 import 'package:inblo_app/common_widgets/inblo_text_button.dart';
 import 'package:inblo_app/common_widgets/inblo_text_field.dart';
-import 'package:inblo_app/constants/app_theme.dart';
 
 class AddHorseDialog extends StatefulWidget {
   const AddHorseDialog({super.key});
@@ -54,6 +55,9 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
               _birthDateController.text = selectedDate;
             });
           },
+          pickerAdapter: DateTimePickerAdapter(
+            maxValue: DateTime.now(),
+          ),
           controller: _birthDateController,
           textHint: "生年月日",
         ),
