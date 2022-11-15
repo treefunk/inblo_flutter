@@ -75,7 +75,7 @@ flutter:
   assets:
     # Environment files
     - .env
-    - .env_staging
+    - .env.staging
     
     # Images 
     - assets/images/img_login_banner.jpg
