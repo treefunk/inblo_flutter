@@ -6,7 +6,9 @@ part 'login_response.g.dart';
 
 @JsonSerializable()
 class LoginResponse {
+  @JsonKey(name: "data")
   final User? data;
+  @JsonKey(name: "meta")
   final MetaResponse metaResponse;
 
   LoginResponse({this.data, required this.metaResponse});
