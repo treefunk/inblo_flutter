@@ -5,9 +5,6 @@ import 'package:inblo_app/features/dashboard/presentation/main_dashboard_screen.
 
 import './constants/app_theme.dart' as app_theme;
 
-import './common_widgets/inblo_text_field.dart';
-import './common_widgets/inblo_text_button.dart';
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
@@ -24,7 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Inblo',
       theme: app_theme.themeData,
       home: MainDashboardScreen(),
     );
