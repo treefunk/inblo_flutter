@@ -1,41 +1,112 @@
 import 'package:flutter/material.dart';
+import 'package:inblo_app/constants/app_theme.dart';
+import 'package:inblo_app/features/auth/presentation/sign_in_screen.dart';
+import 'package:inblo_app/features/auth/providers/auth.dart';
+import 'package:inblo_app/models/user_details.dart';
+import 'package:inblo_app/util/preference_utils.dart';
 
-class SideNavigationDrawer extends StatelessWidget {
+import 'package:provider/provider.dart';
+
+class SideNavigationDrawer extends StatefulWidget {
   const SideNavigationDrawer({
     Key? key,
   }) : super(key: key);
 
   @override
+  State<SideNavigationDrawer> createState() => _SideNavigationDrawerState();
+}
+
+class _SideNavigationDrawerState extends State<SideNavigationDrawer> {
+  Future<UserDetails> getUserDetails() async {
+    return await PreferenceUtils.getUserDetails();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void logout(Auth auth, NavigatorState navigatorState) async {
+    var clearLocalStorage = await auth.logout();
+    if (clearLocalStorage) {
+      navigatorState.pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => SignInScreen(),
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: Column(children: [
-        AppBar(
-          title: Text("Test"),
-          automaticallyImplyLeading: false,
-          actions: [Container()],
-        ),
-        Divider(),
-        ListTile(
-          leading: Icon(Icons.payment),
-          title: Text('test'),
-          onTap: () {},
-        ),
-        ListTile(
-          leading: Icon(Icons.payment),
-          title: Text('test'),
-          onTap: () {},
-        ),
-        ListTile(
-          leading: Icon(Icons.payment),
-          title: Text('test'),
-          onTap: () {},
-        ),
-        ListTile(
-          leading: Icon(Icons.payment),
-          title: Text('test'),
-          onTap: () {},
-        ),
-      ]),
+      elevation: 20,
+      // width: MediaQuery.of(context).size.width * .70,
+      child: Column(
+          // crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            AppBar(
+              toolbarHeight: 80,
+              backgroundColor: colorPrimary,
+              title: ListTile(
+                title: Text(
+                  context.watch<Auth>().userDetails?.username ?? "",
+                  style: TextStyle(
+                      fontFamily: "Roboto",
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 20),
+                ),
+                subtitle: Text(
+                  context.watch<Auth>().userDetails?.roleText ?? "",
+                  style: TextStyle(
+                      fontFamily: "Roboto",
+                      color: Colors.white70,
+                      fontSize: 14),
+                ),
+                contentPadding: EdgeInsets.all(8),
+              ),
+              automaticallyImplyLeading: false,
+              actions: [Container()],
+            ),
+            // Divider(),
+            ListTile(
+              leading: Icon(
+                Icons.info,
+                color: colorPrimaryDark,
+                // size: 30,
+              ),
+              title: Text('地方競馬情報サイト'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.archive,
+                color: colorPrimaryDark,
+                // size: 30,
+              ),
+              title: Text('馬のアーカイブ'),
+              onTap: () {},
+            ),
+            Divider(
+              endIndent: null,
+              indent: null,
+              height: 1,
+              color: colorPrimaryDark,
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.logout,
+                color: colorPrimaryDark,
+                // size: 30,
+              ),
+              title: Text('ログアウト'),
+              onTap: () => logout(
+                Provider.of<Auth>(context, listen: false),
+                Navigator.of(context, rootNavigator: true),
+              ),
+            ),
+          ]),
     );
   }
 }

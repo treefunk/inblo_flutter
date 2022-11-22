@@ -3,9 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:inblo_app/constants/app_theme.dart';
 import 'package:inblo_app/features/calendar/presentation/calendar_screen.dart';
 import 'package:inblo_app/features/tab_daily_reports/presentation/daily_reports_screen.dart';
-import 'package:inblo_app/features/dashboard/presentation/main_dashboard_screen.dart';
-import 'package:inblo_app/features/dashboard/presentation/widgets/inblo_app_bar.dart';
-import 'package:inblo_app/features/dashboard/presentation/widgets/side_navigation_drawer.dart';
 import 'package:inblo_app/features/tab_treatments/presentation/treatments_screen.dart';
 
 import 'widgets/header_with_back_btn.dart';
@@ -20,8 +17,6 @@ class HorseDetailsScreen extends StatefulWidget {
 }
 
 class _HorseDetailsScreenState extends State<HorseDetailsScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   late List<Map<String, Object>> _detailPages;
 
   int _selectedDetailPageIndex = 0;

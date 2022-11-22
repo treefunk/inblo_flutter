@@ -71,7 +71,9 @@ void showCustomDialog({
                                           color: Colors.transparent,
                                           child: InkWell(
                                             onTap: () {
-                                              Navigator.of(context).pop();
+                                              Navigator.of(context,
+                                                      rootNavigator: true)
+                                                  .pop();
                                             },
                                             borderRadius:
                                                 BorderRadius.circular(100),

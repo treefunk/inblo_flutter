@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_picker/flutter_picker.dart';
+import 'package:intl/intl.dart';
 
 import '../constants/app_theme.dart';
 
@@ -44,20 +46,44 @@ InputDecoration getInputDecoration({
         borderSide: BorderSide(width: 2, color: Theme.of(context).primaryColor),
         borderRadius: BorderRadius.circular(4),
       ),
+      errorBorder: OutlineInputBorder(
+        borderSide: BorderSide(width: 1.5, color: Theme.of(context).errorColor),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderSide: BorderSide(width: 2, color: Theme.of(context).errorColor),
+        borderRadius: BorderRadius.circular(4),
+      ),
     );
 
 class InbloTextField extends StatelessWidget {
-  final String textHint;
-  final int maxLines;
-  final TextEditingController? controller;
-  final TextInputType? inputType;
-
   const InbloTextField({
     this.textHint = "- - - - -",
     this.maxLines = 1,
     this.controller,
     this.inputType,
+    this.obscureText = false,
+    this.enableSuggestion = true,
+    this.autocorrect = true,
+    this.isRequired,
+    this.validator,
+    this.focusNode,
+    this.autofocus = true,
+    this.inputFormatters,
   });
+
+  final String textHint;
+  final int maxLines;
+  final TextEditingController? controller;
+  final TextInputType? inputType;
+  final bool obscureText;
+  final bool enableSuggestion;
+  final bool autocorrect;
+  final bool? isRequired;
+  final String? Function(String? value)? validator;
+  final FocusNode? focusNode;
+  final bool autofocus;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +93,24 @@ class InbloTextField extends StatelessWidget {
       decoration: getInputDecoration(context: context, textHint: textHint),
       maxLines: maxLines,
       controller: controller,
-      // textAlign: TextAlign.left,
-      // textAlignVertical: TextAlignVertical.top,
+      obscureText: obscureText,
+      enableSuggestions: enableSuggestion,
+      autocorrect: autocorrect,
+      validator: (value) {
+        if (isRequired != null &&
+            isRequired! &&
+            value != null &&
+            value.isEmpty) {
+          return "This field is required.";
+        }
+        if (validator != null) {
+          return validator!(value);
+        }
+        return null;
+      },
+      focusNode: focusNode,
+      autofocus: autofocus,
+      inputFormatters: inputFormatters,
     );
   }
 }
@@ -78,12 +120,14 @@ class InbloDropdownTextField extends StatelessWidget {
   final String textHint;
   final List<DropdownMenuItem> items;
   final TextEditingController? controller;
+  final String? Function(dynamic value)? validator;
 
   const InbloDropdownTextField({
     required this.onChanged,
     this.textHint = "- - - - -",
     required this.items,
     this.controller,
+    this.validator,
   });
 
   @override
@@ -94,6 +138,7 @@ class InbloDropdownTextField extends StatelessWidget {
       style: inbloTextFieldStyle,
       decoration: getInputDecoration(
           context: context, textHint: textHint, isDense: true),
+      validator: validator,
     );
   }
 }
@@ -103,12 +148,14 @@ class InbloDatePickerField extends StatelessWidget {
   final PickerAdapter pickerAdapter;
   final String textHint;
   final TextEditingController? controller;
+  final String? Function(String? value)? validator;
 
   const InbloDatePickerField({
     required this.onSelectDate,
     required this.pickerAdapter,
     this.textHint = "- - - - -",
     this.controller,
+    this.validator,
   });
 
   showPickerDate(
@@ -130,11 +177,13 @@ class InbloDatePickerField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       onTap: () {
-        // DateTime? dt = await _selectDate(context);
-        // if (dt != null) onSelectDate(dt.toString());
         showPickerDate(context, (picker, value) {
           var selected = (picker.adapter as DateTimePickerAdapter).value;
-          onSelectDate(selected.toString());
+          var dateFormat = "y-MM-dd";
+          if (selected != null) {
+            var formattedDateString = DateFormat(dateFormat).format(selected);
+            onSelectDate(formattedDateString);
+          }
         }, pickerAdapter);
       },
       style: inbloTextFieldStyle,
@@ -144,6 +193,7 @@ class InbloDatePickerField extends StatelessWidget {
       // textAlign: TextAlign.left,
       controller: controller,
       // textAlignVertical: TextAlignVertical.top,
+      validator: validator,
     );
   }
 }
@@ -154,6 +204,8 @@ class InbloNumberPicker extends StatelessWidget {
   final String dialogTitle;
   final String textHint;
   final Widget? delimiter;
+  final String? Function(String? value)? validator;
+
   final TextEditingController? controller;
 
   const InbloNumberPicker({
@@ -163,6 +215,7 @@ class InbloNumberPicker extends StatelessWidget {
     this.delimiter,
     this.textHint = "- - - - -",
     this.controller,
+    this.validator,
   });
 
   showPickerNumber(BuildContext context, PickerAdapter pickerAdapter,
@@ -201,11 +254,11 @@ class InbloNumberPicker extends StatelessWidget {
       },
       style: inbloTextFieldStyle,
       readOnly: true,
-
       decoration: getInputDecoration(context: context, textHint: textHint),
       // textAlign: TextAlign.left,
       controller: controller,
       // textAlignVertical: TextAlignVertical.top,
+      validator: validator,
     );
   }
 }
