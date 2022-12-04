@@ -14,34 +14,38 @@ class LabelValueDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      alignment: Alignment.center,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        // mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
+          Text(
+            label,
+            textAlign: TextAlign.start,
+            style: TextStyle(
+              fontFamily: "Roboto",
+              fontSize: 14,
+              color: colorPrimary,
+              letterSpacing: 1.2,
+            ),
+          ),
+          SizedBox(
+            width: 12,
+          ),
           Expanded(
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: "Roboto",
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: colorPrimaryDark,
-                letterSpacing: 1.5,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Text(
+                value,
+                textAlign: TextAlign.start,
+                style: TextStyle(
+                  fontFamily: "Roboto",
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  color: colorPrimaryDark,
+                ),
               ),
             ),
           ),
-          Expanded(
-            child: Text(
-              value,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: "Roboto",
-                fontSize: 15,
-                color: colorPrimary,
-              ),
-            ),
-          )
         ],
       ),
     );

@@ -7,8 +7,12 @@ import 'package:inblo_app/features/calendar/presentation/calendar_screen.dart';
 import 'package:inblo_app/features/dashboard/presentation/widgets/inblo_app_bar.dart';
 import 'package:inblo_app/features/dashboard/presentation/widgets/side_navigation_drawer.dart';
 import 'package:inblo_app/features/horse_details/presentation/horse_details_screen.dart';
+import 'package:inblo_app/features/horse_list/presentation/horse_archived_screen.dart';
 import 'package:inblo_app/features/horse_list/presentation/horse_list_screen.dart';
+import 'package:inblo_app/features/horse_list/providers/horses.dart';
 import 'package:inblo_app/features/messages/presentation/messages_screen.dart';
+import 'package:inblo_app/models/horse.dart';
+import 'package:provider/provider.dart';
 
 // import '../auth/presentation/sign_up_screen.dart';
 
@@ -116,16 +120,52 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                       ),
                   routes: [
                     GoRoute(
+                      // path: "details/:index",
                       path: "details",
-                      builder: (context, state) => const HorseDetailsScreen(1),
-                    )
+
+                      builder: (context, state) {
+                        // if (state.params['index'] == null) {
+                        //   throw Exception("passed index is null");
+                        // } else {
+                        // Horse selectedHorse = context
+                        //     .read<Horses>()
+                        //     .horses[int.parse(state.params['index']!)];
+
+                        return HorseDetailsScreen(
+                            // selectedHorse,
+                            );
+                        // }
+                      },
+                    ),
+                    GoRoute(
+                      // path: "details/:index",
+                      path: "archived",
+
+                      builder: (context, state) {
+                        // if (state.params['index'] == null) {
+                        //   throw Exception("passed index is null");
+                        // } else {
+                        // Horse selectedHorse = context
+                        //     .read<Horses>()
+                        //     .horses[int.parse(state.params['index']!)];
+
+                        return HorseArchivedScreen();
+                        // }
+                      },
+                    ),
                   ]),
               GoRoute(
                 path: "/message-list",
                 pageBuilder: (context, state) => NoTransitionPage(
                   child: MessagesScreen(),
                 ),
-              )
+              ),
+              GoRoute(
+                path: "/archived-horses-list",
+                pageBuilder: (context, state) => NoTransitionPage(
+                  child: HorseArchivedScreen(),
+                ),
+              ),
             ])
       ],
     );
@@ -176,6 +216,7 @@ class _InbloScaffoldWithBottomNavState
       body: widget.child,
       appBar: InbloAppBar(scaffoldKey: _scaffoldKey),
       endDrawer: SideNavigationDrawer(),
+      resizeToAvoidBottomInset: false,
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         unselectedItemColor: colorPrimaryDark,

@@ -5,7 +5,8 @@ import 'package:inblo_app/common_widgets/inblo_text_button.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:inblo_app/features/horse_list/presentation/add_horse_dialog.dart';
-import 'package:inblo_app/features/horse_list/providers/dropdown.dart';
+import 'package:inblo_app/features/horse_list/providers/persons_in_charge.dart';
+import 'package:inblo_app/features/horse_list/providers/horses.dart';
 import 'package:provider/provider.dart';
 
 import 'widgets/horse_list.dart';
@@ -22,9 +23,16 @@ class _HorseListScreenState extends State<HorseListScreen> {
 
   @override
   void initState() {
-    getUsersFuture =
-        Provider.of<Dropdown>(context, listen: false).initPersonInCharge();
+    getUsersFuture = Provider.of<PersonsInCharge>(context, listen: false)
+        .initPersonInCharge();
     super.initState();
+  }
+
+  void archiveHorse(int horseId) async {
+    if (await showConfirmationDialog(context, "Archive Horse",
+        "Are you sure you want to archive this horse?")) {
+      context.read<Horses>().archiveHorse(horseId);
+    }
   }
 
   @override
@@ -41,7 +49,7 @@ class _HorseListScreenState extends State<HorseListScreen> {
                     showCustomDialog(
                       context: context,
                       title: "管理馬の詳細",
-                      content: AddHorseDialog(),
+                      content: (ctx) => AddHorseDialog(ctx),
                     );
                   },
                   title: "管理馬の追加",
@@ -61,10 +69,22 @@ class _HorseListScreenState extends State<HorseListScreen> {
             }),
       ),
       HorseList(
-        onItemTap: (index) {
+        onHorseTap: (index) {
           // Navigator.of(context).push(MaterialPageRoute(
           //     builder: ((context) => HorseDetailsScreen(index))));
+          Provider.of<Horses>(context, listen: false)
+              .setSelectedHorseByIndex(index);
           context.go("/horse-list/details");
+        },
+        onEditHorse: (context, horse) {
+          showCustomDialog(
+            context: context,
+            title: "管理馬の詳細",
+            content: (ctx) => AddHorseDialog(ctx, horse: horse),
+          );
+        },
+        onArchiveHorse: (context, horse) {
+          archiveHorse(horse.id!);
         },
       )
     ]);

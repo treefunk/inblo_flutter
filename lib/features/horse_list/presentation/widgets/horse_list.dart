@@ -2,17 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:inblo_app/common_widgets/inblo_outlined_button.dart';
 import 'package:inblo_app/constants/app_theme.dart';
-import 'package:inblo_app/features/horse_list/providers/dropdown.dart';
+import 'package:inblo_app/features/horse_list/providers/persons_in_charge.dart';
 import 'package:inblo_app/features/horse_list/providers/horses.dart';
+import 'package:inblo_app/models/horse.dart';
 import 'package:provider/provider.dart';
 
 class HorseList extends StatefulWidget {
   Function(
     int index,
-  ) onItemTap;
+  ) onHorseTap;
+
+  Function(
+    BuildContext context,
+    Horse horse,
+  ) onEditHorse;
+
+  Function(
+    BuildContext context,
+    Horse horse,
+  ) onArchiveHorse;
 
   HorseList({
-    required this.onItemTap,
+    required this.onHorseTap,
+    required this.onEditHorse,
+    required this.onArchiveHorse,
     Key? key,
   }) : super(key: key);
 
@@ -21,7 +34,6 @@ class HorseList extends StatefulWidget {
 }
 
 class _HorseListState extends State<HorseList> {
-  int _highlightedIndex = -1;
   late final Future fetchHorsesFuture;
 
   @override
@@ -61,21 +73,24 @@ class _HorseListState extends State<HorseList> {
                       extentRatio: 0.20,
                       children: [
                         SlidableAction(
-                          onPressed: (ctx) {},
+                          onPressed: (ctx) =>
+                              widget.onArchiveHorse(ctx, horses[index]),
                           backgroundColor: colorPrimaryDark,
                           icon: Icons.archive,
                         )
                       ]),
                   child: Ink(
                     decoration: BoxDecoration(
-                        border: _highlightedIndex == index
-                            ? Border.symmetric(
-                                horizontal: BorderSide(
-                                  width: 1,
-                                  color: colorPrimaryDark,
-                                ),
-                              )
-                            : null),
+                      border: null,
+                      // _highlightedIndex == index
+                      //     ? Border.symmetric(
+                      //         horizontal: BorderSide(
+                      //           width: 1,
+                      //           color: colorPrimaryDark,
+                      //         ),
+                      //       )
+                      //     : null
+                    ),
                     child: InkWell(
                       splashColor: colorPrimary,
                       onHighlightChanged: (highlighted) {
@@ -92,7 +107,7 @@ class _HorseListState extends State<HorseList> {
                       onTap: () {
                         print("ontap $index");
                         // context.beamToNamed("/horse/$index");
-                        widget.onItemTap(index);
+                        widget.onHorseTap(index);
                       },
                       child: ListTile(
                         title: Text(
@@ -107,7 +122,7 @@ class _HorseListState extends State<HorseList> {
                         contentPadding: EdgeInsets.all(16),
                         trailing: InbloOutlinedButton(
                           onPressed: () {
-                            //o
+                            widget.onEditHorse(context, horses[index]);
                           },
                           title: "内容修正",
                         ),

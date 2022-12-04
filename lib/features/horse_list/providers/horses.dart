@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:flutter/foundation.dart';
 import 'package:inblo_app/constants/app_constants.dart';
+import 'package:inblo_app/features/auth/api/boolean_response.dart';
 import 'package:inblo_app/features/horse_list/api/get_horse_response.dart';
 import 'package:inblo_app/features/horse_list/api/horse_list_response.dart';
 import 'package:inblo_app/models/horse.dart';
@@ -14,9 +15,23 @@ class Horses with ChangeNotifier {
   List<Horse> _horses = [
     //
   ];
-
   List<Horse> get horses {
     return [..._horses];
+  }
+
+  List<Horse> _archivedHorses = [
+    //
+  ];
+
+  List<Horse> get archivedHorses {
+    return [..._archivedHorses];
+  }
+
+  late Horse selectedHorse;
+
+  void setSelectedHorseByIndex(int index) {
+    selectedHorse = _horses[index];
+    notifyListeners();
   }
 
   Future<void> fetchHorses() async {
@@ -29,14 +44,31 @@ class Horses with ChangeNotifier {
 
     var jsonResponse = json.decode(response.body);
     print("fetching horses...");
-    print(jsonResponse);
+    // print(jsonResponse);
     var result = HorseListResponse.fromJson(jsonResponse);
     _horses = result.data ?? [];
 
     notifyListeners();
   }
 
-  Future<void> addHorse({
+  Future<void> fetchArchivedHorses() async {
+    UserDetails userDetails = await PreferenceUtils.getUserDetails();
+
+    final url = Uri.parse(
+        "${AppConstants.apiUrl}/horses/stable/${userDetails.stableId}?archived=1");
+
+    final response = await http.get(url);
+
+    var jsonResponse = json.decode(response.body);
+    print("fetching archived horses...");
+    // print(jsonResponse);
+    var result = HorseListResponse.fromJson(jsonResponse);
+    _archivedHorses = result.data ?? [];
+
+    notifyListeners();
+  }
+
+  Future<GetHorseResponse> addHorse({
     required String name,
     required int userId,
     String ownerName = "",
@@ -55,7 +87,13 @@ class Horses with ChangeNotifier {
   }) async {
     UserDetails userDetails = await PreferenceUtils.getUserDetails();
 
-    final url = Uri.parse("${AppConstants.apiUrl}/horses");
+    var urlStr = "${AppConstants.apiUrl}/horses";
+
+    if (horseId != null) {
+      urlStr += "/$horseId";
+    }
+
+    final url = Uri.parse(urlStr);
     // birth_date, user_id
     final horseData = {
       'name': name,
@@ -68,7 +106,7 @@ class Horses with ChangeNotifier {
       'total_stake': totalStake.toString(),
       'owner_name': ownerName,
       'farm_name': farmName,
-      'training_farm_name': motherFatherName,
+      'training_farm_name': trainingFarmName,
       'memo': memo,
       'stable_id': userDetails.stableId.toString(),
     };
@@ -82,19 +120,82 @@ class Horses with ChangeNotifier {
     }
 
     var encodedInput = json.encode(horseData);
-    print(encodedInput);
+    // print(encodedInput);
+    http.Response response;
 
-    final response = await http.post(
-      url,
-      body: encodedInput,
-      headers: {"Content-Type": "application/json"},
-    );
+    print("url: $url");
+
+    if (horseId == null) {
+      // if no id is given, add horse
+      response = await http.post(
+        url,
+        body: encodedInput,
+        headers: {"Content-Type": "application/json"},
+      );
+      print("creating horse..");
+    } else {
+      // update horse
+      response = await http.put(
+        url,
+        body: encodedInput,
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+      );
+      print("updating existing horse");
+    }
 
     var jsonResponse = json.decode(response.body);
-    print("creating horse..");
+    // var test = jsonResponse(GetHorseResponse);
+    // print("test: ${test.metaResponse.message}");
+    print("-------jsonstart---------");
     print(jsonResponse);
+    print("-------jsonend---------");
+
+    // jsonResponse = json.encode((jsonResponse));
+
     var result = GetHorseResponse.fromJson(jsonResponse);
 
-    notifyListeners();
+    if (horseId != null) {
+      selectedHorse = result.data!;
+      notifyListeners();
+    }
+
+    if (result.metaResponse.code == 201) {
+      await fetchHorses();
+    }
+
+    return result;
+
+    // notifyListeners();
+  }
+
+  Future<BooleanResponse> archiveHorse(int horseId) async {
+    final url = Uri.parse("${AppConstants.apiUrl}/horses/archive/$horseId");
+
+    final response = await http.get(url);
+
+    var jsonResponse = json.decode(response.body);
+    print("archiving horse...");
+    // print(jsonResponse);
+    var result = BooleanResponse.fromJson(jsonResponse);
+    fetchHorses();
+    return result;
+  }
+
+  Future<BooleanResponse> restoreArchivedHorse(int horseId) async {
+    final url = Uri.parse("${AppConstants.apiUrl}/horses/restore/$horseId");
+
+    final response = await http.get(url);
+
+    var jsonResponse = json.decode(response.body);
+    print("restoring horse...");
+    // print(jsonResponse);
+    var result = BooleanResponse.fromJson(jsonResponse);
+
+    fetchArchivedHorses();
+
+    return result;
   }
 }

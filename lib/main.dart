@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_web_frame/flutter_web_frame.dart';
 
 import 'package:inblo_app/features/auth/providers/auth.dart';
-import 'package:inblo_app/features/horse_list/providers/dropdown.dart';
+import 'package:inblo_app/features/horse_list/providers/persons_in_charge.dart';
 import 'package:inblo_app/features/horse_list/providers/horses.dart';
+import 'package:inblo_app/features/tab_daily_reports/providers/daily_reports.dart';
 import 'package:inblo_app/home_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -35,14 +37,22 @@ class MyApp extends StatelessWidget {
           create: (ctx) => Auth(),
         ),
         ChangeNotifierProvider(
-          create: (ctx) => Horses(),
+          create: (ctx) => PersonsInCharge(),
         ),
         ChangeNotifierProvider(
-          create: (ctx) => Dropdown(),
+          create: (ctx) => Horses(),
         ),
+        ChangeNotifierProxyProvider<Horses, DailyReports>(
+          create: (context) => DailyReports(null),
+          update: (context, horses, previousDailyReports) =>
+              DailyReports(horses.selectedHorse),
+        )
       ],
-      child: MaterialApp(
-          title: 'Inblo', theme: app_theme.themeData, home: HomeScreen()),
+      child: FlutterWebFrame(
+        maximumSize: Size(600, 812),
+        builder: (ctx) => MaterialApp(
+            title: 'Inblo', theme: app_theme.themeData, home: HomeScreen()),
+      ),
     );
   }
 }

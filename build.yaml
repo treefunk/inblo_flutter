@@ -7,7 +7,7 @@
 #           # `@JsonSerializable`-annotated class in the package.
 #           #
 #           # The default value for each is listed.
-#           # any_map: false
+#           any_map: true
 #           # checked: false
 #           # constructor: ""
 #           # create_factory: true
@@ -19,3 +19,5 @@
 #           generic_argument_factories: false
 #           ignore_unannotated: false
 #           include_if_null: false
+
+# flutter pub run build_runner build

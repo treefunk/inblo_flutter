@@ -4,15 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:inblo_app/constants/app_constants.dart';
 import 'package:inblo_app/features/horse_list/api/get_users_response.dart';
 import 'package:inblo_app/models/dropdown_data.dart';
-import 'package:inblo_app/models/dropdown_data_response.dart';
 import 'package:inblo_app/models/user_details.dart';
 import 'package:inblo_app/util/preference_utils.dart';
 import 'package:http/http.dart' as http;
 
-class Dropdown with ChangeNotifier {
+class PersonsInCharge with ChangeNotifier {
   List<DropdownData> _personInChargeOptions = [];
-  List<DropdownData> _riderOptions = [];
-  List<DropdownData> _trainingTypeOptions = [];
 
   List<DropdownData> get personInChargeOptions {
     return [..._personInChargeOptions];

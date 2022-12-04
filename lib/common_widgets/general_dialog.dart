@@ -6,7 +6,7 @@ import 'package:inblo_app/constants/app_theme.dart';
 void showCustomDialog({
   required BuildContext context,
   required String title,
-  required Widget content,
+  required Widget? Function(BuildContext context) content,
 }) {
   showGeneralDialog(
     context: context,
@@ -95,7 +95,7 @@ void showCustomDialog({
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 24, vertical: 12),
-                          child: content,
+                          child: content(context),
                         )
                       ],
                     ),
@@ -106,4 +106,67 @@ void showCustomDialog({
       );
     },
   );
+}
+
+Future<void> showMyDialog(
+    BuildContext ctx, String title, String message) async {
+  return showDialog<void>(
+    context: ctx,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text(message),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<bool> showConfirmationDialog(
+    BuildContext ctx, String title, String message) async {
+  bool? result = await showDialog<bool?>(
+    context: ctx,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text(message),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              return Navigator.of(context).pop(false);
+            },
+          ),
+          TextButton(
+            child: const Text('Confirm'),
+            onPressed: () {
+              return Navigator.of(context).pop(true);
+            },
+          ),
+        ],
+      );
+    },
+  );
+  return result ?? false;
 }

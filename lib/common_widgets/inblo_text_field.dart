@@ -70,6 +70,7 @@ class InbloTextField extends StatelessWidget {
     this.focusNode,
     this.autofocus = true,
     this.inputFormatters,
+    this.initialValue,
   });
 
   final String textHint;
@@ -84,6 +85,7 @@ class InbloTextField extends StatelessWidget {
   final FocusNode? focusNode;
   final bool autofocus;
   final List<TextInputFormatter>? inputFormatters;
+  final String? initialValue;
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +113,7 @@ class InbloTextField extends StatelessWidget {
       focusNode: focusNode,
       autofocus: autofocus,
       inputFormatters: inputFormatters,
+      initialValue: initialValue,
     );
   }
 }
@@ -119,15 +122,15 @@ class InbloDropdownTextField extends StatelessWidget {
   final Function(dynamic) onChanged;
   final String textHint;
   final List<DropdownMenuItem> items;
-  final TextEditingController? controller;
   final String? Function(dynamic value)? validator;
+  final dynamic value;
 
   const InbloDropdownTextField({
     required this.onChanged,
     this.textHint = "- - - - -",
     required this.items,
-    this.controller,
     this.validator,
+    this.value,
   });
 
   @override
@@ -139,6 +142,7 @@ class InbloDropdownTextField extends StatelessWidget {
       decoration: getInputDecoration(
           context: context, textHint: textHint, isDense: true),
       validator: validator,
+      value: value,
     );
   }
 }

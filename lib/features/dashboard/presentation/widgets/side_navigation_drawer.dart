@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:inblo_app/constants/app_theme.dart';
 import 'package:inblo_app/features/auth/presentation/sign_in_screen.dart';
 import 'package:inblo_app/features/auth/providers/auth.dart';
@@ -86,7 +87,10 @@ class _SideNavigationDrawerState extends State<SideNavigationDrawer> {
                 // size: 30,
               ),
               title: Text('馬のアーカイブ'),
-              onTap: () {},
+              onTap: () {
+                context.go("/archived-horses-list");
+                Navigator.of(context).pop();
+              },
             ),
             Divider(
               endIndent: null,
