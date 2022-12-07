@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: FlutterWebFrame(
-        maximumSize: Size(600, 812),
+        maximumSize: Size(450, 812),
         builder: (ctx) => MaterialApp(
             title: 'Inblo', theme: app_theme.themeData, home: HomeScreen()),
       ),

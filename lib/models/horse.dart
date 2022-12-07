@@ -1,3 +1,4 @@
+import 'package:inblo_app/constants/app_constants.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -124,9 +125,9 @@ class Horse {
   }
 
   String? get getBirthDateOnly {
-    var dateFormat = "y-MM-dd";
     if (birthDate != null) {
-      var formattedDateString = DateFormat(dateFormat).format(birthDate!);
+      var formattedDateString =
+          DateFormat(AppConstants.dateOnlyFormatYmd).format(birthDate!);
       return formattedDateString;
     }
     return null;

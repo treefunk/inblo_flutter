@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_picker/flutter_picker.dart';
+import 'package:inblo_app/constants/app_constants.dart';
 import 'package:intl/intl.dart';
 
 import '../constants/app_theme.dart';
@@ -153,14 +154,15 @@ class InbloDatePickerField extends StatelessWidget {
   final String textHint;
   final TextEditingController? controller;
   final String? Function(String? value)? validator;
+  final bool? isRequired;
 
-  const InbloDatePickerField({
-    required this.onSelectDate,
-    required this.pickerAdapter,
-    this.textHint = "- - - - -",
-    this.controller,
-    this.validator,
-  });
+  const InbloDatePickerField(
+      {required this.onSelectDate,
+      required this.pickerAdapter,
+      this.textHint = "- - - - -",
+      this.controller,
+      this.validator,
+      this.isRequired});
 
   showPickerDate(
       BuildContext context,
@@ -180,25 +182,34 @@ class InbloDatePickerField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      onTap: () {
-        showPickerDate(context, (picker, value) {
-          var selected = (picker.adapter as DateTimePickerAdapter).value;
-          var dateFormat = "y-MM-dd";
-          if (selected != null) {
-            var formattedDateString = DateFormat(dateFormat).format(selected);
-            onSelectDate(formattedDateString);
+        onTap: () {
+          showPickerDate(context, (picker, value) {
+            var selected = (picker.adapter as DateTimePickerAdapter).value;
+            var dateFormat = AppConstants.dateOnlyFormatYmd;
+            if (selected != null) {
+              var formattedDateString = DateFormat(dateFormat).format(selected);
+              onSelectDate(formattedDateString);
+            }
+          }, pickerAdapter);
+        },
+        style: inbloTextFieldStyle,
+        readOnly: true,
+        decoration: getInputDecoration(context: context, textHint: textHint),
+        // textAlign: TextAlign.left,
+        controller: controller,
+        // textAlignVertical: TextAlignVertical.top,
+        validator: (value) {
+          if (isRequired != null &&
+              isRequired! &&
+              value != null &&
+              value.isEmpty) {
+            return "This field is required.";
           }
-        }, pickerAdapter);
-      },
-      style: inbloTextFieldStyle,
-      readOnly: true,
-
-      decoration: getInputDecoration(context: context, textHint: textHint),
-      // textAlign: TextAlign.left,
-      controller: controller,
-      // textAlignVertical: TextAlignVertical.top,
-      validator: validator,
-    );
+          if (validator != null) {
+            return validator!(value);
+          }
+          return null;
+        });
   }
 }
 

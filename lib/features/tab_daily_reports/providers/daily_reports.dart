@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:inblo_app/constants/app_constants.dart';
+import 'package:inblo_app/features/auth/api/boolean_response.dart';
 import 'package:inblo_app/features/tab_daily_reports/api/daily_report_form_response.dart';
 import 'package:inblo_app/features/tab_daily_reports/api/daily_report_list_response.dart';
 import 'package:inblo_app/features/tab_daily_reports/api/get_daily_report_response.dart';
@@ -17,11 +18,11 @@ class DailyReports with ChangeNotifier {
   List<DropdownData> _trainingTypeOptions = [];
 
   List<DropdownData> get riderOptions {
-    return [...riderOptions];
+    return [..._riderOptions];
   }
 
   List<DropdownData> get trainingTypeOptions {
-    return [...trainingTypeOptions];
+    return [..._trainingTypeOptions];
   }
 
   DailyReports(this.selectedHorse);
@@ -59,52 +60,55 @@ class DailyReports with ChangeNotifier {
     }
   }
 
-  Future<GetDailyReportResponse> addDailyReport(
-      int horseId,
-      String date,
-      double bodyTemperature,
-      int horseWeight,
-      String conditionGroup,
-      String riderName, // not needed
-      String trainingTypeName, // not needed
-      int? riderId,
-      int? trainingTypeId,
-      String trainingAmount,
-      double time5f,
-      double time4f,
-      double time3f,
-      String memo,
-      List<String>? dailyAttachedIds,
-      int? id) async {
+  Future<GetDailyReportResponse> addDailyReport({
+    required int horseId,
+    required String date,
+    required double bodyTemperature,
+    required int horseWeight,
+    required String conditionGroup,
+    // required String riderName, // not needed
+    // required String trainingTypeName, // not needed
+    required int? riderId,
+    required int? trainingTypeId,
+    required String trainingAmount,
+    required double time5f,
+    required double time4f,
+    required double time3f,
+    required String memo,
+    required List<String>? dailyAttachedIds,
+    required int? id,
+  }) async {
     var urlStr = "${AppConstants.apiUrl}/daily-reports";
 
     if (id != null) {
       urlStr += "/$id";
     }
 
+    print(urlStr);
+
     final url = Uri.parse(urlStr);
 
     Map<String, dynamic> dailyReportData = {
-      'horse_id': horseId,
-      'date': date,
-      'body_temperature': bodyTemperature,
-      'horse_weight': horseWeight,
-      'condition_group': conditionGroup,
-      'rider_name': riderName,
-      'training_type_name': trainingTypeName,
-      'training_amount': trainingAmount,
-      '5f_time': time5f,
-      '4f_time': time4f,
-      '3f_time': time3f,
-      'memo': memo
+      'horse_id': horseId.toString(),
+      'date': date.toString(),
+      'body_temperature': bodyTemperature.toString(),
+      'horse_weight': horseWeight.toString(),
+      'condition_group': conditionGroup.toString(),
+      // 'rider_name': riderName,
+      // 'training_type_name': trainingTypeName,
+      'training_amount': trainingAmount.toString(),
+      '5f_time': time5f.toString(),
+      '4f_time': time4f.toString(),
+      '3f_time': time3f.toString(),
+      'memo': memo.toString()
     };
 
     if (riderId != null) {
-      dailyReportData["rider_id"] = riderId;
+      dailyReportData["rider_id"] = riderId.toString();
     }
 
     if (trainingTypeId != null) {
-      dailyReportData["training_type_id"] = trainingTypeId;
+      dailyReportData["training_type_id"] = trainingTypeId.toString();
     }
 
     if (dailyAttachedIds != null) {
@@ -115,10 +119,19 @@ class DailyReports with ChangeNotifier {
 
     var encodedInput = json.encode(dailyReportData);
 
-    var response = await http.post(url, body: encodedInput, headers: {
+    print(encodedInput);
+
+    var headers = {
       "Accept": "application/json",
       "Content-Type": "application/json"
-    });
+    };
+    dynamic response;
+    if (id == null) {
+      // insert
+      response = await http.post(url, body: encodedInput, headers: headers);
+    } else {
+      response = await http.put(url, body: encodedInput, headers: headers);
+    }
 
     var jsonResponse = json.decode(response.body);
 
@@ -126,6 +139,12 @@ class DailyReports with ChangeNotifier {
 
     GetDailyReportResponse result =
         GetDailyReportResponse.fromJson(jsonResponse);
+    print(json.encode(result.metaResponse));
+
+    if (result.metaResponse.code == 201 || result.metaResponse.code == 200) {
+      await fetchDailyReports();
+      notifyListeners();
+    }
 
     return result;
   }
@@ -137,6 +156,7 @@ class DailyReports with ChangeNotifier {
     var url = Uri.parse(
         "${AppConstants.apiUrl}/daily_reports/get-form/${userDetails.stableId}");
 
+    print("fetching daily report form data....");
     final response = await http.get(url);
 
     var jsonResponse = json.decode(response.body);
@@ -149,5 +169,22 @@ class DailyReports with ChangeNotifier {
     _trainingTypeOptions = result.data?.trainingTypes ?? [];
 
     notifyListeners();
+  }
+
+  Future<BooleanResponse> removeDailyReport(int dailyReportId) async {
+    var urlStr = "${AppConstants.apiUrl}/daily-reports/$dailyReportId";
+    var response = await http.delete(Uri.parse(urlStr));
+
+    var decodedResponse = json.decode(response.body);
+
+    print(decodedResponse);
+    BooleanResponse result = BooleanResponse.fromJson(decodedResponse);
+
+    if (result.metaResponse.code == 201) {
+      await fetchDailyReports();
+      notifyListeners();
+    }
+
+    return result;
   }
 }

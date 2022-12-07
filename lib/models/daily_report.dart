@@ -1,5 +1,7 @@
+import 'package:inblo_app/constants/app_constants.dart';
 import 'package:inblo_app/models/attached_file.dart';
 import 'package:inblo_app/models/dropdown_data.dart';
+import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'daily_report.g.dart';
@@ -36,6 +38,14 @@ class DailyReport {
   final int? horseId;
 
   final DateTime? date;
+
+  String? get formattedDate {
+    if (date != null) {
+      var dt = DateTime.parse(date.toString());
+      return DateFormat(AppConstants.dateOnlyFormatYmd).format(dt);
+    }
+    return null;
+  }
 
   @JsonKey(name: "body_temperature")
   final double? bodyTemperature;

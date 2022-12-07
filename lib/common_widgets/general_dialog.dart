@@ -108,7 +108,7 @@ void showCustomDialog({
   );
 }
 
-Future<void> showMyDialog(
+Future<void> showOkDialog(
     BuildContext ctx, String title, String message) async {
   return showDialog<void>(
     context: ctx,

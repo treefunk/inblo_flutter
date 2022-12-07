@@ -3,11 +3,9 @@ import 'package:inblo_app/common_widgets/general_dialog.dart';
 import 'package:inblo_app/common_widgets/inblo_white_rounded_button.dart';
 import 'package:inblo_app/common_widgets/table_column_label.dart';
 import 'package:inblo_app/constants/app_theme.dart';
-import 'package:inblo_app/features/horse_list/providers/horses.dart';
 import 'package:inblo_app/features/tab_daily_reports/presentation/add_daily_report_dialog.dart';
 import 'package:inblo_app/features/tab_daily_reports/providers/daily_reports.dart';
 import 'package:inblo_app/models/daily_report.dart';
-import 'package:inblo_app/models/horse.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:provider/provider.dart';
 
@@ -28,19 +26,26 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
 
   late final Future getDailyReportsFuture;
 
+  Future<void> _getDailyReportData() async {
+    var dailyReportProvider = Provider.of<DailyReports>(context, listen: false);
+
+    await dailyReportProvider.fetchDailyReports();
+    await dailyReportProvider.initDailyReportDropdown();
+  }
+
   @override
   void initState() {
     _linkedControllerGroup = LinkedScrollControllerGroup();
     _columnsScrollController = _linkedControllerGroup.addAndGet();
     _dataTableScrollController = _linkedControllerGroup.addAndGet();
-    getDailyReportsFuture =
-        Provider.of<DailyReports>(context, listen: false).fetchDailyReports();
+    getDailyReportsFuture = _getDailyReportData();
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    print("build daily report screen");
     return FutureBuilder(
         future: getDailyReportsFuture,
         builder: (context, snapshot) {
@@ -65,20 +70,19 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
                     child: Column(
                       children: [
                         Container(
-                          height: 35,
-                          width: double.infinity,
-                          child: InbloWhiteRoundedButton(
-                            onPressed: () {
-                              showCustomDialog(
-                                context: context,
-                                title: "状態入力",
-                                content: (ctx) => AddDailyReportDialog(),
-                              );
-                            },
-                            title: "状態を記録する",
-                            iconPrefix: Icons.add,
-                          ),
-                        ),
+                            height: 35,
+                            width: double.infinity,
+                            child: InbloWhiteRoundedButton(
+                              onPressed: () {
+                                showCustomDialog(
+                                  context: context,
+                                  title: "状態入力",
+                                  content: (ctx) => AddDailyReportDialog(),
+                                );
+                              },
+                              title: "状態を記録する",
+                              iconPrefix: Icons.add,
+                            )),
                         SizedBox(
                           height: 8,
                         ),
@@ -196,13 +200,30 @@ class DailyReportsColumn extends StatelessWidget {
   }
 }
 
-class ItemDailyReport extends StatelessWidget {
+class ItemDailyReport extends StatefulWidget {
   const ItemDailyReport({
     required this.dailyReport,
     Key? key,
   }) : super(key: key);
 
   final DailyReport dailyReport;
+
+  @override
+  State<ItemDailyReport> createState() => _ItemDailyReportState();
+}
+
+class _ItemDailyReportState extends State<ItemDailyReport> {
+  void _deleteDailyReport(BuildContext context, int dailyReportId) async {
+    bool wantDelete = await showConfirmationDialog(
+        context, "Confirm", "Are you sure you to delete this?");
+
+    if (mounted && wantDelete) {
+      Provider.of<DailyReports>(
+        context,
+        listen: false,
+      ).removeDailyReport(dailyReportId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -219,25 +240,68 @@ class ItemDailyReport extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: [
-          SizedBox(width: 50),
+          Row(
+            children: [
+              SizedBox(width: 3),
+              Material(
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () {
+                    showCustomDialog(
+                      context: context,
+                      title: "状態入力",
+                      content: (ctx) => AddDailyReportDialog(
+                        dailyReport: widget.dailyReport,
+                      ),
+                    );
+                  },
+                  child: Icon(
+                    Icons.edit_note,
+                    size: 20,
+                  ),
+                ),
+              ),
+              SizedBox(width: 4),
+              Material(
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () =>
+                      _deleteDailyReport(context, widget.dailyReport.id!),
+                  child: Icon(
+                    Icons.delete,
+                    color: Colors.red[900],
+                    size: 20,
+                  ),
+                ),
+              ),
+              SizedBox(width: 3),
+            ],
+          ),
 
-          TableValueLabel(title: dailyReport.date?.toString() ?? ""), //date
+          TableValueLabel(
+              title: widget.dailyReport.formattedDate?.toString() ?? ""), //date
+          TableValueLabel(
+              title: widget.dailyReport.bodyTemperature?.toString() ??
+                  ""), //temperature
           TableValueLabel(
               title:
-                  dailyReport.bodyTemperature?.toString() ?? ""), //temperature
+                  widget.dailyReport.horseWeight?.toString() ?? ""), // weight
           TableValueLabel(
-              title: dailyReport.horseWeight?.toString() ?? ""), // weight
+              title: widget.dailyReport.conditionGroup!), // condition group
           TableValueLabel(
-              title: dailyReport.conditionGroup!), // condition group
-          TableValueLabel(title: dailyReport.rider?.name ?? ""), // rider name
+              title: widget.dailyReport.rider?.name ?? ""), // rider name
           TableValueLabel(
-              title: dailyReport.trainingType?.name ?? ""), // training type
+              title:
+                  widget.dailyReport.trainingType?.name ?? ""), // training type
           TableValueLabel(
-              title: dailyReport.trainingAmount ?? ""), // training amount
-          TableValueLabel(title: dailyReport.time5f?.toString() ?? ""),
-          TableValueLabel(title: dailyReport.time4f?.toString() ?? ""),
-          TableValueLabel(title: dailyReport.time3f?.toString() ?? ""),
-          TableValueLabel(title: dailyReport.memo ?? ""), // notes/memo
+              title:
+                  widget.dailyReport.trainingAmount ?? ""), // training amount
+          TableValueLabel(title: widget.dailyReport.time5f?.toString() ?? ""),
+          TableValueLabel(title: widget.dailyReport.time4f?.toString() ?? ""),
+          TableValueLabel(title: widget.dailyReport.time3f?.toString() ?? ""),
+          TableValueLabel(title: widget.dailyReport.memo ?? ""), // notes/memo
           TableValueLabel(title: "view attached"), //
         ],
       ),

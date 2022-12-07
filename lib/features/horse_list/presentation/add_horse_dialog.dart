@@ -28,8 +28,6 @@ class AddHorseDialog extends StatefulWidget {
 }
 
 class _AddHorseDialogState extends State<AddHorseDialog> {
-  late Horse? _horse;
-
   final _nameController = TextEditingController();
   final _ownerNameController = TextEditingController();
   final _farmNameController = TextEditingController();
@@ -68,29 +66,9 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
   @override
   void initState() {
     super.initState();
-    _horse = widget.horse;
+
     if (widget.horse != null) {
-      // print(json.encode(widget.horse!));
-      _nameController.text = widget.horse?.name ?? "";
-      _ownerNameController.text = widget.horse?.ownerName ?? "";
-      _farmNameController.text = widget.horse?.farmName ?? "";
-      _trainingFarmNameController.text = widget.horse?.trainingFarmName ?? "";
-
-      _classController.text = widget.horse?.horseClass ?? "";
-      _birthDateController.text = widget.horse?.getBirthDateOnly ?? "";
-      _fatherController.text = widget.horse?.fatherName ?? "";
-      _motherController.text = widget.horse?.motherName ?? "";
-      _motherFatherConroller.text = widget.horse?.motherFatherName ?? "";
-      _totalStakeController.text = (widget.horse?.totalStake ?? 0.0).toString();
-      _notesController.text = widget.horse?.memo ?? "";
-
-      // special fields
-      if (widget.horse?.user != null) {
-        _personInCharge = widget.horse?.user!.id;
-      }
-
-      _sex = widget.horse?.sex ?? "";
-      _color = widget.horse?.color ?? "";
+      initFields();
     }
   }
 
@@ -108,7 +86,7 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
     NavigatorState contextNavigator,
   ) async {
     if (!validateForm()) {
-      await showMyDialog(context, "Error", "Please enter required fields.");
+      await showOkDialog(context, "Error", "Please enter required fields.");
       return;
     }
 
@@ -150,8 +128,32 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
       );
       contextNavigator.pop();
     } else {
-      await showMyDialog(context, "Error", metaResponse.message);
+      await showOkDialog(context, "Error", metaResponse.message);
     }
+  }
+
+  void initFields() {
+    // print(json.encode(widget.horse!));
+    _nameController.text = widget.horse?.name ?? "";
+    _ownerNameController.text = widget.horse?.ownerName ?? "";
+    _farmNameController.text = widget.horse?.farmName ?? "";
+    _trainingFarmNameController.text = widget.horse?.trainingFarmName ?? "";
+
+    _classController.text = widget.horse?.horseClass ?? "";
+    _birthDateController.text = widget.horse?.getBirthDateOnly ?? "";
+    _fatherController.text = widget.horse?.fatherName ?? "";
+    _motherController.text = widget.horse?.motherName ?? "";
+    _motherFatherConroller.text = widget.horse?.motherFatherName ?? "";
+    _totalStakeController.text = (widget.horse?.totalStake ?? 0.0).toString();
+    _notesController.text = widget.horse?.memo ?? "";
+
+    // special fields
+    if (widget.horse?.user != null) {
+      _personInCharge = widget.horse?.user!.id;
+    }
+
+    _sex = widget.horse?.sex ?? "";
+    _color = widget.horse?.color ?? "";
   }
 
   @override
