@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -51,7 +52,18 @@ class MyApp extends StatelessWidget {
       child: FlutterWebFrame(
         maximumSize: Size(450, 812),
         builder: (ctx) => MaterialApp(
-            title: 'Inblo', theme: app_theme.themeData, home: HomeScreen()),
+          title: 'Inblo',
+          theme: app_theme.themeData,
+          scrollBehavior: MaterialScrollBehavior().copyWith(
+            dragDevices: {
+              PointerDeviceKind.mouse,
+              PointerDeviceKind.touch,
+              PointerDeviceKind.stylus,
+              PointerDeviceKind.unknown
+            },
+          ),
+          home: HomeScreen(),
+        ),
       ),
     );
   }

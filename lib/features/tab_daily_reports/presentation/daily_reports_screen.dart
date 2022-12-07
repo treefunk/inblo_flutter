@@ -6,6 +6,7 @@ import 'package:inblo_app/constants/app_theme.dart';
 import 'package:inblo_app/features/tab_daily_reports/presentation/add_daily_report_dialog.dart';
 import 'package:inblo_app/features/tab_daily_reports/providers/daily_reports.dart';
 import 'package:inblo_app/models/daily_report.dart';
+import 'package:inblo_app/util/inblo_desktop_scroll_behavior.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:provider/provider.dart';
 
@@ -90,57 +91,64 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
                     ),
                   ),
                   if (dailyReports.isNotEmpty)
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      controller: _columnsScrollController,
-                      child: Container(
-                        width: 1266,
-                        margin: EdgeInsets.symmetric(horizontal: 8),
-                        padding: EdgeInsets.symmetric(horizontal: 8),
-                        decoration: BoxDecoration(
-                          color: colorPrimaryDark,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10),
+                    ScrollConfiguration(
+                      behavior: InbloDesktopScrollBehavior(),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        controller: _columnsScrollController,
+                        child: Container(
+                          width: 1266,
+                          margin: EdgeInsets.symmetric(horizontal: 8),
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          decoration: BoxDecoration(
+                            color: colorPrimaryDark,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              topRight: Radius.circular(10),
+                            ),
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            SizedBox(width: 50),
-                            TableColumnLabel(title: "日付"), //date
-                            TableColumnLabel(title: "体温"), //temperature
-                            TableColumnLabel(title: "馬体重"), // weight
-                            TableColumnLabel(title: "馬場状態"), // condition group
-                            TableColumnLabel(title: "乗り手"), // rider name
-                            TableColumnLabel(title: "調教内容"), // training type
-                            TableColumnLabel(title: "調教量"), // training amount
-                            TableColumnLabel(title: "5F"),
-                            TableColumnLabel(title: "4F"),
-                            TableColumnLabel(title: "3F"),
-                            TableColumnLabel(title: "メモ"), // notes/memo
-                            TableColumnLabel(title: "添付ファイル"), // attachments
-                          ],
+                          child: Row(
+                            children: [
+                              SizedBox(width: 50),
+                              TableColumnLabel(title: "日付"), //date
+                              TableColumnLabel(title: "体温"), //temperature
+                              TableColumnLabel(title: "馬体重"), // weight
+                              TableColumnLabel(
+                                  title: "馬場状態"), // condition group
+                              TableColumnLabel(title: "乗り手"), // rider name
+                              TableColumnLabel(title: "調教内容"), // training type
+                              TableColumnLabel(title: "調教量"), // training amount
+                              TableColumnLabel(title: "5F"),
+                              TableColumnLabel(title: "4F"),
+                              TableColumnLabel(title: "3F"),
+                              TableColumnLabel(title: "メモ"), // notes/memo
+                              TableColumnLabel(title: "添付ファイル"), // attachments
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   if (dailyReports.isNotEmpty)
                     Flexible(
-                      child: SingleChildScrollView(
-                        controller: _dataTableScrollController,
-                        scrollDirection: Axis.horizontal,
-                        child: Container(
-                            // height: constraints.maxHeight
-                            width: 1266,
-                            margin: EdgeInsets.symmetric(horizontal: 8),
-                            color: Colors.white,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              physics: ScrollPhysics(),
-                              itemCount: dailyReports.length,
-                              itemBuilder: ((ctx, index) => ItemDailyReport(
-                                    dailyReport: dailyReports[index],
-                                  )),
-                            )),
+                      child: ScrollConfiguration(
+                        behavior: InbloDesktopScrollBehavior(),
+                        child: SingleChildScrollView(
+                          controller: _dataTableScrollController,
+                          scrollDirection: Axis.horizontal,
+                          child: Container(
+                              // height: constraints.maxHeight
+                              width: 1266,
+                              margin: EdgeInsets.symmetric(horizontal: 8),
+                              color: Colors.white,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                physics: ScrollPhysics(),
+                                itemCount: dailyReports.length,
+                                itemBuilder: ((ctx, index) => ItemDailyReport(
+                                      dailyReport: dailyReports[index],
+                                    )),
+                              )),
+                        ),
                       ),
                     ),
                   SizedBox(

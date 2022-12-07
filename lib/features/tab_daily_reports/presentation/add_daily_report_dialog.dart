@@ -9,6 +9,7 @@ import 'package:inblo_app/features/tab_daily_reports/providers/daily_reports.dar
 import 'package:inblo_app/models/daily_report.dart';
 import 'package:inblo_app/models/meta_response.dart';
 import 'package:provider/provider.dart';
+import 'package:inblo_app/constants/my_ext.dart';
 
 class AddDailyReportDialog extends StatefulWidget {
   AddDailyReportDialog({super.key, this.dailyReport});
@@ -83,15 +84,15 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
     var getDailyReportResponse = await dailyReportsProvider.addDailyReport(
       horseId: selectedHorse.id!,
       date: _dateController.text,
-      bodyTemperature: double.parse(_bodyTempController.text),
-      horseWeight: int.parse(_horseWeightController.text),
+      bodyTemperature: _bodyTempController.text.parseDoubleOrZero(),
+      horseWeight: _horseWeightController.text.parseIntOrZero(),
       conditionGroup: _conditionGroup,
       riderId: _riderId,
       trainingTypeId: _trainingTypeId,
       trainingAmount: _trainingAmountController.text,
-      time5f: double.parse(_time5fController.text),
-      time4f: double.parse(_time4fController.text),
-      time3f: double.parse(_time3fController.text),
+      time5f: _time5fController.text.parseDoubleOrZero(),
+      time4f: _time4fController.text.parseDoubleOrZero(),
+      time3f: _time3fController.text.parseDoubleOrZero(),
       memo: _memoController.text,
       dailyAttachedIds: null,
       id: widget.dailyReport?.id,
