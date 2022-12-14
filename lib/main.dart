@@ -50,18 +50,10 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: FlutterWebFrame(
-        maximumSize: Size(450, 812),
+        maximumSize: Size(424, 812),
         builder: (ctx) => MaterialApp(
           title: 'Inblo',
           theme: app_theme.themeData,
-          scrollBehavior: MaterialScrollBehavior().copyWith(
-            dragDevices: {
-              PointerDeviceKind.mouse,
-              PointerDeviceKind.touch,
-              PointerDeviceKind.stylus,
-              PointerDeviceKind.unknown
-            },
-          ),
           home: HomeScreen(),
         ),
       ),

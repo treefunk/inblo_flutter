@@ -27,6 +27,12 @@ const bottomNavTxtStyle = TextStyle(
   fontSize: 13,
 );
 
+const attachedTxtStyle = TextStyle(
+  fontFamily: "Hiragino",
+  color: colorPrimaryDark,
+  fontSize: 12,
+);
+
 const buttonBigTxtStyle = TextStyle(
   fontFamily: "Hiragino",
   color: Colors.white,
@@ -39,4 +45,12 @@ const buttonMediumTxtStyle = TextStyle(
   color: Colors.white,
   letterSpacing: 1.4,
   fontSize: 12,
+);
+
+const buttonSmallTxtStyle = TextStyle(
+  fontFamily: "Roboto",
+  // fontWeight: FontWeight.bold,
+  color: Colors.white,
+  // letterSpacing: 1.4,
+  fontSize: 10,
 );

@@ -5,6 +5,7 @@ import 'package:inblo_app/constants/app_theme.dart';
 import 'package:inblo_app/features/horse_list/providers/persons_in_charge.dart';
 import 'package:inblo_app/features/horse_list/providers/horses.dart';
 import 'package:inblo_app/models/horse.dart';
+import 'package:inblo_app/util/inblo_desktop_scroll_behavior.dart';
 import 'package:provider/provider.dart';
 
 class HorseList extends StatefulWidget {
@@ -65,66 +66,69 @@ class _HorseListState extends State<HorseList> {
             } else {
               var horses = context.watch<Horses>().horses;
               return Expanded(
-                  child: ListView.builder(
-                itemCount: horses.length,
-                itemBuilder: (context, index) => Slidable(
-                  endActionPane: ActionPane(
-                      motion: ScrollMotion(),
-                      extentRatio: 0.20,
-                      children: [
-                        SlidableAction(
-                          onPressed: (ctx) =>
-                              widget.onArchiveHorse(ctx, horses[index]),
-                          backgroundColor: colorPrimaryDark,
-                          icon: Icons.archive,
-                        )
-                      ]),
-                  child: Ink(
-                    decoration: BoxDecoration(
-                      border: null,
-                      // _highlightedIndex == index
-                      //     ? Border.symmetric(
-                      //         horizontal: BorderSide(
-                      //           width: 1,
-                      //           color: colorPrimaryDark,
-                      //         ),
-                      //       )
-                      //     : null
-                    ),
-                    child: InkWell(
-                      splashColor: colorPrimary,
-                      onHighlightChanged: (highlighted) {
-                        // if (highlighted) {
-                        //   setState(() {
-                        //     _highlightedIndex = index;
-                        //   });
-                        // } else {
-                        //   setState(() {
-                        //     _highlightedIndex = -1;
-                        //   });
-                        // }
-                      },
-                      onTap: () {
-                        print("ontap $index");
-                        // context.beamToNamed("/horse/$index");
-                        widget.onHorseTap(index);
-                      },
-                      child: ListTile(
-                        title: Text(
-                          "${index + 1}. ${horses[index].name}",
-                          style: TextStyle(
-                            fontFamily: "Roboto",
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: colorPrimaryDark,
+                  child: ScrollConfiguration(
+                behavior: InbloDesktopScrollBehavior(),
+                child: ListView.builder(
+                  itemCount: horses.length,
+                  itemBuilder: (context, index) => Slidable(
+                    endActionPane: ActionPane(
+                        motion: ScrollMotion(),
+                        extentRatio: 0.20,
+                        children: [
+                          SlidableAction(
+                            onPressed: (ctx) =>
+                                widget.onArchiveHorse(ctx, horses[index]),
+                            backgroundColor: colorPrimaryDark,
+                            icon: Icons.archive,
+                          )
+                        ]),
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        border: null,
+                        // _highlightedIndex == index
+                        //     ? Border.symmetric(
+                        //         horizontal: BorderSide(
+                        //           width: 1,
+                        //           color: colorPrimaryDark,
+                        //         ),
+                        //       )
+                        //     : null
+                      ),
+                      child: InkWell(
+                        splashColor: colorPrimary,
+                        onHighlightChanged: (highlighted) {
+                          // if (highlighted) {
+                          //   setState(() {
+                          //     _highlightedIndex = index;
+                          //   });
+                          // } else {
+                          //   setState(() {
+                          //     _highlightedIndex = -1;
+                          //   });
+                          // }
+                        },
+                        onTap: () {
+                          print("ontap $index");
+                          // context.beamToNamed("/horse/$index");
+                          widget.onHorseTap(index);
+                        },
+                        child: ListTile(
+                          title: Text(
+                            "${index + 1}. ${horses[index].name}",
+                            style: TextStyle(
+                              fontFamily: "Roboto",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: colorPrimaryDark,
+                            ),
                           ),
-                        ),
-                        contentPadding: EdgeInsets.all(16),
-                        trailing: InbloOutlinedButton(
-                          onPressed: () {
-                            widget.onEditHorse(context, horses[index]);
-                          },
-                          title: "内容修正",
+                          contentPadding: EdgeInsets.all(16),
+                          trailing: InbloOutlinedButton(
+                            onPressed: () {
+                              widget.onEditHorse(context, horses[index]);
+                            },
+                            title: "内容修正",
+                          ),
                         ),
                       ),
                     ),

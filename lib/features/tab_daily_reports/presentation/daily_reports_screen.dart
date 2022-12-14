@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inblo_app/features/horse_details/file_attachments/attached_dialog.dart';
 import 'package:inblo_app/common_widgets/general_dialog.dart';
 import 'package:inblo_app/common_widgets/inblo_white_rounded_button.dart';
 import 'package:inblo_app/common_widgets/table_column_label.dart';
@@ -247,45 +248,49 @@ class _ItemDailyReportState extends State<ItemDailyReport> {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              SizedBox(width: 3),
-              Material(
-                shape: const CircleBorder(),
-                child: InkWell(
-                  customBorder: const CircleBorder(),
-                  onTap: () {
-                    showCustomDialog(
-                      context: context,
-                      title: "状態入力",
-                      content: (ctx) => AddDailyReportDialog(
-                        dailyReport: widget.dailyReport,
-                      ),
-                    );
-                  },
-                  child: Icon(
-                    Icons.edit_note,
-                    size: 20,
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Row(
+              children: [
+                SizedBox(width: 3),
+                Material(
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: () {
+                      showCustomDialog(
+                        context: context,
+                        title: "状態入力",
+                        content: (ctx) => AddDailyReportDialog(
+                          dailyReport: widget.dailyReport,
+                        ),
+                      );
+                    },
+                    child: Icon(
+                      Icons.edit_note,
+                      size: 20,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(width: 4),
-              Material(
-                shape: const CircleBorder(),
-                child: InkWell(
-                  customBorder: const CircleBorder(),
-                  onTap: () =>
-                      _deleteDailyReport(context, widget.dailyReport.id!),
-                  child: Icon(
-                    Icons.delete,
-                    color: Colors.red[900],
-                    size: 20,
+                SizedBox(width: 4),
+                Material(
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: () =>
+                        _deleteDailyReport(context, widget.dailyReport.id!),
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.red[900],
+                      size: 20,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(width: 3),
-            ],
+                SizedBox(width: 3),
+              ],
+            ),
           ),
 
           TableValueLabel(
@@ -310,7 +315,18 @@ class _ItemDailyReportState extends State<ItemDailyReport> {
           TableValueLabel(title: widget.dailyReport.time4f?.toString() ?? ""),
           TableValueLabel(title: widget.dailyReport.time3f?.toString() ?? ""),
           TableValueLabel(title: widget.dailyReport.memo ?? ""), // notes/memo
-          TableValueLabel(title: "view attached"), //
+          if (widget.dailyReport.attachedFiles != null &&
+              widget.dailyReport.attachedFiles!.isNotEmpty)
+            GestureDetector(
+                onTap: () {
+                  showCustomDialog(
+                    context: context,
+                    title: "",
+                    content: (ctx) => AttachedDialog.fromDailyReport(
+                        widget.dailyReport.attachedFiles!),
+                  );
+                },
+                child: TableValueLabel(title: "ファイル")), //
         ],
       ),
     );

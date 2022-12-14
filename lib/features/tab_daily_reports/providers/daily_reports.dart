@@ -1,17 +1,24 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:inblo_app/constants/app_constants.dart';
 import 'package:inblo_app/features/auth/api/boolean_response.dart';
 import 'package:inblo_app/features/tab_daily_reports/api/daily_report_form_response.dart';
 import 'package:inblo_app/features/tab_daily_reports/api/daily_report_list_response.dart';
 import 'package:inblo_app/features/tab_daily_reports/api/get_daily_report_response.dart';
+import 'package:inblo_app/models/attached_file.dart';
 import 'package:inblo_app/models/daily_report.dart';
 import 'package:http/http.dart' as http;
 import 'package:inblo_app/models/dropdown_data.dart';
 import 'package:inblo_app/models/horse.dart';
 import 'package:inblo_app/models/user_details.dart';
 import 'package:inblo_app/util/preference_utils.dart';
+import 'package:mime/mime.dart';
+
+// import 'dart:html' as
 
 class DailyReports with ChangeNotifier {
   List<DropdownData> _riderOptions = [];
@@ -75,7 +82,8 @@ class DailyReports with ChangeNotifier {
     required double time4f,
     required double time3f,
     required String memo,
-    required List<String>? dailyAttachedIds,
+    required List<String> dailyAttachedIds,
+    required List<AttachedFile> uploadedFiles,
     required int? id,
   }) async {
     var urlStr = "${AppConstants.apiUrl}/daily-reports";
@@ -103,18 +111,20 @@ class DailyReports with ChangeNotifier {
       'memo': memo.toString()
     };
 
+    if (dailyAttachedIds.isNotEmpty) {
+      dailyReportData['attached_file_ids'] = dailyAttachedIds;
+      // for (String id in dailyAttachedIds) {
+      //   // dailyReportData['attached_file_ids[]'] = id;
+      //   dailyReportData.addAll({'attached_file_ids[]': id});
+      // }
+    }
+
     if (riderId != null) {
       dailyReportData["rider_id"] = riderId.toString();
     }
 
     if (trainingTypeId != null) {
       dailyReportData["training_type_id"] = trainingTypeId.toString();
-    }
-
-    if (dailyAttachedIds != null) {
-      for (var id in dailyAttachedIds) {
-        dailyReportData["attached_file_ids[]"] = id;
-      }
     }
 
     var encodedInput = json.encode(dailyReportData);
@@ -142,11 +152,63 @@ class DailyReports with ChangeNotifier {
     print(json.encode(result.metaResponse));
 
     if (result.metaResponse.code == 201 || result.metaResponse.code == 200) {
+      if (result.data != null) {
+        for (AttachedFile file in uploadedFiles) {
+          await uploadFilesToDailyReport(result.data!.id!, file);
+        }
+      }
       await fetchDailyReports();
       notifyListeners();
     }
 
     return result;
+  }
+
+  Future<http.MultipartFile> getMultipartByPlatform(AttachedFile file) async {
+    // print("file type is ${xFile.mimeType}");
+    // print("path -> " +xFile.path.toString() + xFile.name);
+
+    if (!kIsWeb) {
+      var f = File(file.filePath!);
+
+      var mimeType = lookupMimeType(f.path)!.split("/");
+      return await http.MultipartFile.fromPath(
+        'file',
+        file.filePath!,
+        contentType: MediaType(mimeType[0], mimeType[1]),
+      );
+    } else {
+      var mimeType = lookupMimeType(file.name!)!.split("/");
+      print(file.toJson());
+      return http.MultipartFile.fromBytes(
+        'file',
+        file.webFile!,
+        filename: file.filePath,
+        contentType: MediaType(mimeType[0], mimeType[1]),
+      );
+    }
+  }
+
+  Future<void> uploadFilesToDailyReport(
+      int id, AttachedFile attachedFile) async {
+    var urlStr = "${AppConstants.apiUrl}/daily_reports/attachfile/$id";
+    final url = Uri.parse(urlStr);
+
+    var multipartFuture = await getMultipartByPlatform(attachedFile);
+
+    var headers = {
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    };
+
+    var request = http.MultipartRequest("POST", url)
+      ..files.add(await getMultipartByPlatform(attachedFile));
+
+    var response = await request.send();
+
+    print(response.stream.bytesToString());
+
+    //
   }
 
   // populate rider and training type dropdown data

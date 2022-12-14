@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:inblo_app/constants/app_theme.dart';
 import 'package:inblo_app/constants/text_styles.dart';
 
-enum TextStyleInbloButton { big, medium }
+enum TextStyleInbloButton { big, medium, small }
 
 extension ButtonTypeExtension on TextStyleInbloButton {
   TextStyle get getTextStyle {
@@ -11,6 +11,8 @@ extension ButtonTypeExtension on TextStyleInbloButton {
         return buttonBigTxtStyle;
       case TextStyleInbloButton.medium:
         return buttonMediumTxtStyle;
+      case TextStyleInbloButton.small:
+        return buttonSmallTxtStyle;
     }
   }
 }

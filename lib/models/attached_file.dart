@@ -1,4 +1,10 @@
+import 'dart:io';
+
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:mime/mime.dart';
+import 'package:path/path.dart' as path;
 
 part 'attached_file.g.dart';
 
@@ -12,6 +18,7 @@ class AttachedFile {
     this.contentType,
     this.createdAt,
     this.updatedAt,
+    this.webFile,
   });
 
   final int? id;
@@ -27,8 +34,28 @@ class AttachedFile {
   @JsonKey(name: "updated_at")
   final DateTime? updatedAt;
 
+  final Uint8List? webFile;
+
   factory AttachedFile.fromJson(Map<String, dynamic> json) =>
       _$AttachedFileFromJson(json);
 
   Map<String, dynamic> toJson() => _$AttachedFileToJson(this);
+
+  static AttachedFile fromXFile(XFile xfile) => AttachedFile(
+        name: path.basename(xfile.path),
+        filePath: xfile.path,
+        contentType: lookupMimeType(xfile.path),
+      );
+
+  static List<AttachedFile> fromXFileList(List<XFile> xfiles) =>
+      xfiles.map((xf) => AttachedFile.fromXFile(xf)).toList();
+
+  static AttachedFile fromFile(File file) => AttachedFile(
+        name: path.basename(file.path),
+        filePath: file.path,
+        contentType: lookupMimeType(file.path),
+      );
+
+  static AttachedFile fromU8intList(String filename, Uint8List uint8list) =>
+      AttachedFile(name: filename, filePath: filename, webFile: uint8list);
 }
