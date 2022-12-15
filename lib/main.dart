@@ -8,6 +8,7 @@ import 'package:inblo_app/features/auth/providers/auth.dart';
 import 'package:inblo_app/features/horse_list/providers/persons_in_charge.dart';
 import 'package:inblo_app/features/horse_list/providers/horses.dart';
 import 'package:inblo_app/features/tab_daily_reports/providers/daily_reports.dart';
+import 'package:inblo_app/features/tab_treatments/providers/treatments.dart';
 import 'package:inblo_app/home_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -47,6 +48,11 @@ class MyApp extends StatelessWidget {
           create: (context) => DailyReports(null),
           update: (context, horses, previousDailyReports) =>
               DailyReports(horses.selectedHorse),
+        ),
+        ChangeNotifierProxyProvider<Horses, Treatments>(
+          create: (context) => Treatments(null),
+          update: (context, horses, previousTreatments) =>
+              Treatments(horses.selectedHorse),
         )
       ],
       child: FlutterWebFrame(

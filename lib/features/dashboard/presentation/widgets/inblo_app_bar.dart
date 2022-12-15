@@ -24,6 +24,7 @@ class _InbloAppBarState extends State<InbloAppBar> {
   Widget build(BuildContext context) {
     return AppBar(
       // toolbarHeight: 55,
+
       backgroundColor: Colors.white,
       leading: Container(
         margin: EdgeInsets.only(left: 16),

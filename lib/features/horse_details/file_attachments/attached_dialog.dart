@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:inblo_app/common_widgets/inblo_text_button.dart';
 import 'package:inblo_app/features/horse_details/file_attachments/inblo_video_player.dart';
 import 'package:inblo_app/constants/app_constants.dart';
 import 'package:inblo_app/models/attached_file.dart';
+import 'package:mime/mime.dart';
 import 'package:video_player/video_player.dart';
 
 class AttachedDialog extends StatefulWidget {
@@ -53,9 +55,10 @@ class _AttachedDialogState extends State<AttachedDialog> {
   @override
   Widget build(BuildContext context) {
     var file = widget.attachedFiles[index];
-    var isImage = file.contentType?.contains("image") ?? false;
+    var fileType = lookupMimeType(file.name!);
+    var isImage = fileType?.contains("image") ?? false;
     // print(file.toJson());
-    print(getUrlByIndex(index));
+    // print(getUrlByIndex(index));
     return Column(
       children: [
         Row(
@@ -87,7 +90,7 @@ class _AttachedDialogState extends State<AttachedDialog> {
         ),
         isImage
             ? InteractiveViewer(
-                child: file.id == null
+                child: file.id == null && !kIsWeb
                     ? Image.file(
                         File(widget.attachedFiles[index].filePath!),
                       )

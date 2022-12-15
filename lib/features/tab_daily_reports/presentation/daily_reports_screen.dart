@@ -24,16 +24,8 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
   late LinkedScrollControllerGroup _linkedControllerGroup;
   late ScrollController _columnsScrollController;
   late ScrollController _dataTableScrollController;
-  final _columnKey = GlobalKey();
 
   late final Future getDailyReportsFuture;
-
-  Future<void> _getDailyReportData() async {
-    var dailyReportProvider = Provider.of<DailyReports>(context, listen: false);
-
-    await dailyReportProvider.fetchDailyReports();
-    await dailyReportProvider.initDailyReportDropdown();
-  }
 
   @override
   void initState() {
@@ -43,6 +35,13 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
     getDailyReportsFuture = _getDailyReportData();
 
     super.initState();
+  }
+
+  Future<void> _getDailyReportData() async {
+    var dailyReportProvider = Provider.of<DailyReports>(context, listen: false);
+
+    await dailyReportProvider.fetchDailyReports();
+    await dailyReportProvider.initDailyReportDropdown();
   }
 
   @override
@@ -97,8 +96,9 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         controller: _columnsScrollController,
+                        physics: BouncingScrollPhysics(),
                         child: Container(
-                          width: 1266,
+                          // width: 1266,
                           margin: EdgeInsets.symmetric(horizontal: 8),
                           padding: EdgeInsets.symmetric(horizontal: 8),
                           decoration: BoxDecoration(
@@ -136,6 +136,7 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
                         child: SingleChildScrollView(
                           controller: _dataTableScrollController,
                           scrollDirection: Axis.horizontal,
+                          physics: BouncingScrollPhysics(),
                           child: Container(
                               // height: constraints.maxHeight
                               width: 1266,
@@ -143,7 +144,7 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
                               color: Colors.white,
                               child: ListView.builder(
                                 shrinkWrap: true,
-                                physics: ScrollPhysics(),
+                                physics: BouncingScrollPhysics(),
                                 itemCount: dailyReports.length,
                                 itemBuilder: ((ctx, index) => ItemDailyReport(
                                       dailyReport: dailyReports[index],
@@ -163,51 +164,51 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
   }
 }
 
-class DailyReportsColumn extends StatelessWidget {
-  const DailyReportsColumn({
-    Key? key,
-    required ScrollController columnsScrollController,
-  })  : _columnsScrollController = columnsScrollController,
-        super(key: key);
+// class DailyReportsColumn extends StatelessWidget {
+//   const DailyReportsColumn({
+//     Key? key,
+//     required ScrollController columnsScrollController,
+//   })  : _columnsScrollController = columnsScrollController,
+//         super(key: key);
 
-  final ScrollController _columnsScrollController;
+//   final ScrollController _columnsScrollController;
 
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      controller: _columnsScrollController,
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 8),
-        padding: EdgeInsets.symmetric(horizontal: 8),
-        decoration: BoxDecoration(
-          color: colorPrimaryDark,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(10),
-            topRight: Radius.circular(10),
-          ),
-        ),
-        child: Row(
-          children: [
-            SizedBox(width: 50),
-            TableColumnLabel(title: "日付"), //date
-            TableColumnLabel(title: "体温"), //temperature
-            TableColumnLabel(title: "馬体重"), // weight
-            TableColumnLabel(title: "馬場状態"), // condition group
-            TableColumnLabel(title: "乗り手"), // rider name
-            TableColumnLabel(title: "調教内容"), // training type
-            TableColumnLabel(title: "調教量"), // training amount
-            TableColumnLabel(title: "5F"),
-            TableColumnLabel(title: "4F"),
-            TableColumnLabel(title: "3F"),
-            TableColumnLabel(title: "メモ"), // notes/memo
-            TableColumnLabel(title: "添付ファイル"), // attachments
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return SingleChildScrollView(
+//       scrollDirection: Axis.horizontal,
+//       controller: _columnsScrollController,
+//       child: Container(
+//         margin: EdgeInsets.symmetric(horizontal: 8),
+//         padding: EdgeInsets.symmetric(horizontal: 8),
+//         decoration: BoxDecoration(
+//           color: colorPrimaryDark,
+//           borderRadius: BorderRadius.only(
+//             topLeft: Radius.circular(10),
+//             topRight: Radius.circular(10),
+//           ),
+//         ),
+//         child: Row(
+//           children: [
+//             SizedBox(width: 50),
+//             TableColumnLabel(title: "日付"), //date
+//             TableColumnLabel(title: "体温"), //temperature
+//             TableColumnLabel(title: "馬体重"), // weight
+//             TableColumnLabel(title: "馬場状態"), // condition group
+//             TableColumnLabel(title: "乗り手"), // rider name
+//             TableColumnLabel(title: "調教内容"), // training type
+//             TableColumnLabel(title: "調教量"), // training amount
+//             TableColumnLabel(title: "5F"),
+//             TableColumnLabel(title: "4F"),
+//             TableColumnLabel(title: "3F"),
+//             TableColumnLabel(title: "メモ"), // notes/memo
+//             TableColumnLabel(title: "添付ファイル"), // attachments
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class ItemDailyReport extends StatefulWidget {
   const ItemDailyReport({

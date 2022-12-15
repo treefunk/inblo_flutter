@@ -16,9 +16,9 @@ class AttachedFilePicker {
     if (isMobilePlatform) {
       // Mobile
       FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.any,
+        // type: FileType.image,
         allowMultiple: false,
-        allowedExtensions: ['png', 'jpg', 'jpeg', 'mp4', 'mov'],
+        // allowedExtensions: ['png', 'jpg', 'jpeg', 'mp4', 'mov'],
       );
 
       if (result == null) return;
@@ -41,7 +41,7 @@ class AttachedFilePicker {
             lookupMimeType(filename)!.contains("video");
 
         if (!isValidFileFormat) {
-          throw (Exception("Please select a valid image or video file type."));
+          throw InvalidFileFormat();
         }
 
         AttachedFile attachedFile =
@@ -66,5 +66,17 @@ class AttachedFilePicker {
     } else {
       // not supported
     }
+  }
+}
+
+class InvalidFileFormat implements Exception {
+  String message;
+  InvalidFileFormat({
+    this.message = "Invalid File format. Please select a valid file.",
+  });
+
+  @override
+  String toString() {
+    return message;
   }
 }

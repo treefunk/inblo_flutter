@@ -70,6 +70,7 @@ class _HorseListState extends State<HorseList> {
                 behavior: InbloDesktopScrollBehavior(),
                 child: ListView.builder(
                   itemCount: horses.length,
+                  physics: BouncingScrollPhysics(),
                   itemBuilder: (context, index) => Slidable(
                     endActionPane: ActionPane(
                         motion: ScrollMotion(),

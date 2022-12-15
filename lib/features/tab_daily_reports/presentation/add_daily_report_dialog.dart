@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_picker/Picker.dart';
@@ -7,7 +5,6 @@ import 'package:inblo_app/common_widgets/general_dialog.dart';
 import 'package:inblo_app/common_widgets/inblo_text_button.dart';
 import 'package:inblo_app/common_widgets/inblo_text_field.dart';
 import 'package:inblo_app/constants/app_theme.dart';
-import 'package:inblo_app/features/horse_details/file_attachments/attached_file_picker.dart';
 import 'package:inblo_app/features/horse_details/file_attachments/attachments_box.dart';
 import 'package:inblo_app/features/tab_daily_reports/providers/daily_reports.dart';
 import 'package:inblo_app/models/attached_file.dart';
@@ -32,7 +29,6 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
 
   int? _riderId;
   int? _trainingTypeId;
-  String _conditionGroup = "";
 
   List<AttachedFile> _attachedFiles = [];
   late List<AttachedFile> attachedFiles;
@@ -48,6 +44,8 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
   final _memoController = TextEditingController();
 
   final List<String> conditionGroupChoices = ["良", "稍重", "重", "不良"];
+  String _conditionGroup = "";
+
   final _trainingAmountController = TextEditingController();
 
   final _form = GlobalKey<FormState>();
@@ -57,31 +55,31 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
     super.initState();
     print("init add daily report");
 
-    if (widget.dailyReport != null) {
-      initFields();
-    }
+    initFields();
 
     //clone to avoid side effects on original data
     attachedFiles = [..._attachedFiles];
   }
 
   void initFields() {
-    var dailyReport = widget.dailyReport!;
-    _dateController.text = dailyReport.formattedDate ?? "";
-    _bodyTempController.text = dailyReport.bodyTemperature.toString();
-    _horseWeightController.text = dailyReport.horseWeight.toString();
-    _riderId = dailyReport.rider?.id;
-    _trainingTypeId = dailyReport.trainingType?.id;
-    _conditionGroup = dailyReport.conditionGroup ?? "";
-    _time5fController.text = dailyReport.time5f?.toString() ?? "";
-    _time4fController.text = dailyReport.time4f?.toString() ?? "";
-    _time3fController.text = dailyReport.time3f?.toString() ?? "";
-    _memoController.text = dailyReport.memo ?? "";
-    _trainingAmountController.text = dailyReport.trainingAmount ?? "";
+    if (widget.dailyReport != null) {
+      var dailyReport = widget.dailyReport!;
+      _dateController.text = dailyReport.formattedDate ?? "";
+      _bodyTempController.text = dailyReport.bodyTemperature.toString();
+      _horseWeightController.text = dailyReport.horseWeight.toString();
+      _riderId = dailyReport.rider?.id;
+      _trainingTypeId = dailyReport.trainingType?.id;
+      _conditionGroup = dailyReport.conditionGroup ?? "";
+      _time5fController.text = dailyReport.time5f?.toString() ?? "";
+      _time4fController.text = dailyReport.time4f?.toString() ?? "";
+      _time3fController.text = dailyReport.time3f?.toString() ?? "";
+      _memoController.text = dailyReport.memo ?? "";
+      _trainingAmountController.text = dailyReport.trainingAmount ?? "";
 
-    if (dailyReport.attachedFiles != null &&
-        dailyReport.attachedFiles!.isNotEmpty) {
-      _attachedFiles = dailyReport.attachedFiles!;
+      if (dailyReport.attachedFiles != null &&
+          dailyReport.attachedFiles!.isNotEmpty) {
+        _attachedFiles = dailyReport.attachedFiles!;
+      }
     }
   }
 
@@ -309,48 +307,28 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
           SizedBox(
             height: 16,
           ),
-          //todo add upload btn here ( ファイルを追加 )
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: colorPrimary, width: 1.5)
-                // color: Colors.grey[200],
-                ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AttachmentsBox(
-                  attachedFiles: currentAndUploadedFiles,
-                  onCaptureImage: () {
-                    AttachedFilePicker.captureImage((attachedFile) {
-                      setState(() {
-                        _uploadedFiles.add(attachedFile);
-                      });
-                    });
-                  },
-                  onPickFile: () {
-                    AttachedFilePicker.pickFile((attachedFile) {
-                      setState(() {
-                        _uploadedFiles.add(attachedFile);
-                      });
-                    });
-                  },
-                  onDeleteExisting: (index) {
-                    setState(() {
-                      attachedFiles.removeAt(index);
-                    });
-                  },
-                  onDeleteUploaded: (index) {
-                    setState(() {
-                      _uploadedFiles.removeAt(index);
-                    });
-                  },
-                )
-              ],
-            ),
+          AttachmentsBox(
+            attachedFiles: currentAndUploadedFiles,
+            onCaptureImage: (attachedFile) {
+              setState(() {
+                _uploadedFiles.add(attachedFile);
+              });
+            },
+            onPickFile: (attachedFile) {
+              setState(() {
+                _uploadedFiles.add(attachedFile);
+              });
+            },
+            onDeleteExisting: (index) {
+              setState(() {
+                attachedFiles.removeAt(index);
+              });
+            },
+            onDeleteUploaded: (index) {
+              setState(() {
+                _uploadedFiles.removeAt(index);
+              });
+            },
           ),
           SizedBox(
             height: 10,

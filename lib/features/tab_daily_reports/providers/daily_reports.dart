@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:inblo_app/constants/app_constants.dart';
 import 'package:inblo_app/features/auth/api/boolean_response.dart';
 import 'package:inblo_app/features/tab_daily_reports/api/daily_report_form_response.dart';
@@ -21,17 +20,6 @@ import 'package:mime/mime.dart';
 // import 'dart:html' as
 
 class DailyReports with ChangeNotifier {
-  List<DropdownData> _riderOptions = [];
-  List<DropdownData> _trainingTypeOptions = [];
-
-  List<DropdownData> get riderOptions {
-    return [..._riderOptions];
-  }
-
-  List<DropdownData> get trainingTypeOptions {
-    return [..._trainingTypeOptions];
-  }
-
   DailyReports(this.selectedHorse);
 
   final Horse? selectedHorse;
@@ -42,6 +30,18 @@ class DailyReports with ChangeNotifier {
 
   List<DailyReport> get dailyReports {
     return [..._dailyReports];
+  }
+
+  List<DropdownData> _riderOptions = [];
+
+  List<DropdownData> get riderOptions {
+    return [..._riderOptions];
+  }
+
+  List<DropdownData> _trainingTypeOptions = [];
+
+  List<DropdownData> get trainingTypeOptions {
+    return [..._trainingTypeOptions];
   }
 
   Future<void> fetchDailyReports() async {
@@ -113,10 +113,6 @@ class DailyReports with ChangeNotifier {
 
     if (dailyAttachedIds.isNotEmpty) {
       dailyReportData['attached_file_ids'] = dailyAttachedIds;
-      // for (String id in dailyAttachedIds) {
-      //   // dailyReportData['attached_file_ids[]'] = id;
-      //   dailyReportData.addAll({'attached_file_ids[]': id});
-      // }
     }
 
     if (riderId != null) {

@@ -49,7 +49,7 @@ class _HorseDetailsScreenState extends State<HorseDetailsScreen> {
             HeaderWithBackBtn(),
             HorseDetailsCard(
               horseName: horse.name ?? "",
-              horseGenderAge: horse?.getGenderAndAge ?? "",
+              horseGenderAge: horse.getGenderAndAge,
               onEditHorse: () {
                 if (horse != null) {
                   showCustomDialog(

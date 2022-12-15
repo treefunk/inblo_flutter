@@ -34,6 +34,7 @@ class AttachedFile {
   @JsonKey(name: "updated_at")
   final DateTime? updatedAt;
 
+  @JsonKey(ignore: true)
   final Uint8List? webFile;
 
   factory AttachedFile.fromJson(Map<String, dynamic> json) =>

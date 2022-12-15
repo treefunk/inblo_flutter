@@ -119,31 +119,54 @@ class InbloTextField extends StatelessWidget {
   }
 }
 
-class InbloDropdownTextField extends StatelessWidget {
+class InbloDropdownTextField extends StatefulWidget {
   final Function(dynamic) onChanged;
   final String textHint;
   final List<DropdownMenuItem> items;
   final String? Function(dynamic value)? validator;
-  final dynamic value;
+  dynamic value;
+  final bool? isRequired;
 
-  const InbloDropdownTextField({
+  InbloDropdownTextField({
     required this.onChanged,
     this.textHint = "- - - - -",
     required this.items,
     this.validator,
     this.value,
+    this.isRequired = false,
   });
+
+  @override
+  State<InbloDropdownTextField> createState() => _InbloDropdownTextFieldState();
+}
+
+class _InbloDropdownTextFieldState extends State<InbloDropdownTextField> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField(
-      onChanged: onChanged,
-      items: items,
+      onChanged: widget.onChanged,
+      items: widget.items,
       style: inbloTextFieldStyle,
       decoration: getInputDecoration(
-          context: context, textHint: textHint, isDense: true),
-      validator: validator,
-      value: value,
+          context: context, textHint: widget.textHint, isDense: true),
+      validator: (value) {
+        if (widget.isRequired != null &&
+            widget.isRequired! &&
+            value != null &&
+            value.isEmpty) {
+          return "This field is required.";
+        }
+        if (widget.validator != null) {
+          return widget.validator!(value);
+        }
+        return null;
+      },
+      value: widget.value,
     );
   }
 }
