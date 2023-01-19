@@ -10,6 +10,7 @@ import 'package:inblo_app/common_widgets/inblo_text_field.dart';
 import 'package:inblo_app/constants/app_constants.dart';
 import 'package:inblo_app/features/horse_list/providers/persons_in_charge.dart';
 import 'package:inblo_app/features/horse_list/providers/horses.dart';
+import 'package:inblo_app/models/dropdown_data.dart';
 import 'package:inblo_app/models/horse.dart';
 import 'package:inblo_app/models/meta_response.dart';
 import 'package:provider/provider.dart';
@@ -45,8 +46,10 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
       GlobalKey<ScaffoldMessengerState>();
 
   int? _personInCharge;
-  String _sex = "";
-  String _color = "";
+  String? _sex;
+  String? _color;
+
+  bool _isLoading = false;
 
   final List<String> _colorChoices = [
     "鹿毛",
@@ -91,11 +94,13 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
     }
 
     var horses = Provider.of<Horses>(context, listen: false);
+
+    _setLoading(true);
     var getHorseResponse = await horses.addHorse(
       name: _nameController.text,
       userId: _personInCharge ?? 0,
-      sex: _sex,
-      color: _color,
+      sex: _sex ?? "",
+      color: _color ?? "",
       ownerName: _ownerNameController.text,
       farmName: _farmNameController.text,
       trainingFarmName: _trainingFarmNameController.text,
@@ -110,6 +115,7 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
       memo: _notesController.text,
       horseId: widget.horse?.id,
     );
+    _setLoading(false);
 
     MetaResponse metaResponse = getHorseResponse.metaResponse;
 
@@ -152,8 +158,8 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
       _personInCharge = widget.horse?.user!.id;
     }
 
-    _sex = widget.horse?.sex ?? "";
-    _color = widget.horse?.color ?? "";
+    _sex = widget.horse?.sex;
+    _color = widget.horse?.color;
   }
 
   @override
@@ -169,7 +175,7 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
             height: 16,
           ),
           InbloTextField(
-            textHint: "馬名", // horse name
+            textHint: "馬名*", // horse name
             controller: _nameController,
             validator: ((value) {
               if (value != null && value.isEmpty) {
@@ -180,7 +186,7 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
           ),
           SizedBox(height: 12),
           // "担当者"
-          Consumer<PersonsInCharge>(
+          Consumer<Users>(
               builder: ((ctx, dropdown, child) => InbloDropdownTextField(
                     onChanged: (value) {
                       if (value.toString().isNotEmpty) {
@@ -189,12 +195,17 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
                         _personInCharge = null;
                       }
                     },
-                    items: dropdown.personInChargeOptions
+                    items: [DropdownData(), ...dropdown.personInChargeOptions]
                         .map((p) => DropdownMenuItem(
                             value: p.id, child: Text(p.name ?? "")))
                         .toList(),
                     textHint: "担当者", // person in charge
                     value: _personInCharge,
+                    onClearValue: () {
+                      setState(() {
+                        _personInCharge = null;
+                      });
+                    },
                   ))),
           SizedBox(height: 12),
           InbloTextField(
@@ -235,6 +246,7 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
                 .toList(),
             textHint: "性", // sex
             value: _sex,
+            // validator: AppConstants.requireCallback,
           ),
           SizedBox(height: 12),
           InbloDropdownTextField(
@@ -246,6 +258,7 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
                 .toList(),
             textHint: "毛色", // color
             value: _color,
+            // validator: AppConstants.requireCallback,
           ),
 
           SizedBox(height: 12),
@@ -287,11 +300,14 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
           SizedBox(
             height: 16,
           ),
-          InbloTextButton(
-            onPressed: () => _addHorse(scaffoldMessenger, contextNavigator),
-            title: "＋ 追加",
-            textStyle: TextStyleInbloButton.big,
-          )
+          _isLoading
+              ? CircularProgressIndicator()
+              : InbloTextButton(
+                  onPressed: () =>
+                      _addHorse(scaffoldMessenger, contextNavigator),
+                  title: "＋ 追加",
+                  textStyle: TextStyleInbloButton.big,
+                )
         ],
       ),
     );
@@ -311,5 +327,11 @@ class _AddHorseDialogState extends State<AddHorseDialog> {
     _totalStakeController.dispose();
     _notesController.dispose();
     super.dispose();
+  }
+
+  void _setLoading(bool state) {
+    setState(() {
+      _isLoading = state;
+    });
   }
 }

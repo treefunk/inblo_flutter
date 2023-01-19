@@ -33,7 +33,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   final _form = GlobalKey<FormState>();
 
-  bool _loadIndicator = false;
+  bool _isLoading = false;
 
   bool validateForm() {
     return _form.currentState?.validate() ?? false;
@@ -43,9 +43,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (!validateForm()) {
       return;
     }
-    setState(() {
-      _loadIndicator = true;
-    });
+    _setLoading(true);
     var loginResponse = await auth.registerUser(
       _usernameController.text,
       _passwordController.text,
@@ -55,9 +53,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _selectedRole.roleNum,
       _stableCodeController.text,
     );
-    setState(() {
-      _loadIndicator = false;
-    });
+    _setLoading(false);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -208,11 +204,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     isRequired: true,
                   ),
                   SizedBox(height: 24),
-                  InbloTextButton(
-                    onPressed: () => _registerUser(context, auth),
-                    title: "登録", // register button
-                    textStyle: TextStyleInbloButton.big,
-                  ),
+                  _isLoading
+                      ? CircularProgressIndicator()
+                      : InbloTextButton(
+                          onPressed: () => _registerUser(context, auth),
+                          title: "登録", // register button
+                          textStyle: TextStyleInbloButton.big,
+                        ),
                   SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -242,6 +240,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
     );
+  }
+
+  void _setLoading(bool state) {
+    setState(() {
+      _isLoading = state;
+    });
   }
 
   @override

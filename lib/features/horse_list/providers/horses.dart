@@ -7,6 +7,7 @@ import 'package:inblo_app/constants/app_constants.dart';
 import 'package:inblo_app/features/auth/api/boolean_response.dart';
 import 'package:inblo_app/features/horse_list/api/get_horse_response.dart';
 import 'package:inblo_app/features/horse_list/api/horse_list_response.dart';
+import 'package:inblo_app/features/tab_daily_reports/providers/daily_reports.dart';
 import 'package:inblo_app/models/horse.dart';
 import 'package:inblo_app/models/user_details.dart';
 import 'package:inblo_app/util/preference_utils.dart';
@@ -117,6 +118,8 @@ class Horses with ChangeNotifier {
 
     if (userId > 0) {
       horseData["user_id"] = userId.toString();
+    } else {
+      horseData["user_id"] = "-1"; // remove user
     }
 
     var encodedInput = json.encode(horseData);
@@ -159,6 +162,7 @@ class Horses with ChangeNotifier {
 
     if (horseId != null) {
       selectedHorse = result.data!;
+      DailyReports(selectedHorse).notifyListeners();
       notifyListeners();
     }
 
@@ -197,5 +201,9 @@ class Horses with ChangeNotifier {
     fetchArchivedHorses();
 
     return result;
+  }
+
+  Horse getHorseById(int id) {
+    return horses.firstWhere((element) => element.id == id);
   }
 }

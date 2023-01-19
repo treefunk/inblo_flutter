@@ -9,5 +9,16 @@ class AppConstants {
   static final GlobalKey<ScaffoldState> mainDashboardScaffoldKey =
       GlobalKey<ScaffoldState>();
 
+  static final wholeNumberRegX = RegExp(r'^\d+$');
+
+  static final wholeAndDecimalRegX = RegExp(r'^\d*(\.\d+)?$');
+
   static const dateOnlyFormatYmd = "y-MM-dd";
+
+  static String? requireCallback(value) {
+    if (value == null) {
+      return "This field is required";
+    }
+    return null;
+  }
 }

@@ -38,6 +38,14 @@ class _HorseDetailsScreenState extends State<HorseDetailsScreen> {
   Widget build(BuildContext context) {
     Horse horse = context.watch<Horses>().selectedHorse;
 
+    List<Widget> contentTabs = [
+      DailyReportsScreen(),
+      TreatmentsScreen(),
+      CalendarScreen(
+        horse: horse,
+      )
+    ];
+
     return Material(
       type: MaterialType.transparency,
       child: Container(
@@ -115,11 +123,7 @@ class _HorseDetailsScreenState extends State<HorseDetailsScreen> {
               ],
             ),
             Expanded(
-              child: IndexedStack(index: _selectedDetailPageIndex, children: [
-                DailyReportsScreen(),
-                TreatmentsScreen(),
-                CalendarScreen(),
-              ]),
+              child: contentTabs[_selectedDetailPageIndex],
             )
           ],
         ),

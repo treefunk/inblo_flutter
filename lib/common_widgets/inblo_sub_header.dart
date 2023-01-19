@@ -7,10 +7,12 @@ import '../constants/app_theme.dart';
 class InbloSubHeader extends StatelessWidget {
   String title;
   Widget? trailing;
+  bool? textOnly;
 
   InbloSubHeader({
     required this.title,
     this.trailing,
+    this.textOnly,
     Key? key,
   }) : super(key: key);
 
@@ -37,7 +39,8 @@ class InbloSubHeader extends StatelessWidget {
                 SizedBox(
                   width: 8,
                 ),
-                SvgPicture.asset("assets/svg/ic-horse.svg")
+                if (textOnly == null || (textOnly != null && !textOnly!))
+                  SvgPicture.asset("assets/svg/ic-horse.svg")
               ],
             ),
           ),

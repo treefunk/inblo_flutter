@@ -8,14 +8,24 @@ import 'package:inblo_app/models/user_details.dart';
 import 'package:inblo_app/util/preference_utils.dart';
 import 'package:http/http.dart' as http;
 
-class PersonsInCharge with ChangeNotifier {
+class Users with ChangeNotifier {
   List<DropdownData> _personInChargeOptions = [];
 
   List<DropdownData> get personInChargeOptions {
     return [..._personInChargeOptions];
   }
 
-  Future<void> initPersonInCharge({int? excludeId, int? stableId = -1}) async {
+  List<DropdownData> _userRecipients = [];
+
+  List<DropdownData> get userRecipients {
+    return [..._userRecipients];
+  }
+
+  Future<void> fetchUsers({
+    bool? excludeAuthUser,
+    int? stableId = -1,
+    bool forMessageRecipients = false,
+  }) async {
     UserDetails userDetails = await PreferenceUtils.getUserDetails();
 
     var urlString = "${AppConstants.apiUrl}/users?";
@@ -26,11 +36,11 @@ class PersonsInCharge with ChangeNotifier {
       urlString += "stable_id=$stableId";
     }
 
-    if (excludeId != null) {
+    if (excludeAuthUser != null && excludeAuthUser) {
       if (stableId != null) {
         urlString += "&";
       }
-      urlString += "exclude_id=$excludeId";
+      urlString += "exclude_id=${userDetails.userId}";
     }
 
     final url = Uri.parse(urlString);
@@ -41,10 +51,18 @@ class PersonsInCharge with ChangeNotifier {
     var jsonResponse = json.decode(response.body);
     print("fetching users....");
     var result = GetUsersResponse.fromJson(jsonResponse);
-    _personInChargeOptions = result.data
-            ?.map((user) => DropdownData(id: user.id, name: user.username))
-            .toList() ??
-        [];
+
+    if (!forMessageRecipients) {
+      _personInChargeOptions = result.data
+              ?.map((user) => DropdownData(id: user.id, name: user.username))
+              .toList() ??
+          [];
+    } else {
+      _userRecipients = result.data
+              ?.map((user) => DropdownData(id: user.id, name: user.username))
+              .toList() ??
+          [];
+    }
 
     notifyListeners();
   }

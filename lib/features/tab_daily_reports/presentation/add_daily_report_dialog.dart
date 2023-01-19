@@ -4,11 +4,13 @@ import 'package:flutter_picker/Picker.dart';
 import 'package:inblo_app/common_widgets/general_dialog.dart';
 import 'package:inblo_app/common_widgets/inblo_text_button.dart';
 import 'package:inblo_app/common_widgets/inblo_text_field.dart';
+import 'package:inblo_app/constants/app_constants.dart';
 import 'package:inblo_app/constants/app_theme.dart';
 import 'package:inblo_app/features/horse_details/file_attachments/attachments_box.dart';
 import 'package:inblo_app/features/tab_daily_reports/providers/daily_reports.dart';
 import 'package:inblo_app/models/attached_file.dart';
 import 'package:inblo_app/models/daily_report.dart';
+import 'package:inblo_app/models/dropdown_data.dart';
 import 'package:inblo_app/models/meta_response.dart';
 import 'package:provider/provider.dart';
 import 'package:inblo_app/constants/my_ext.dart';
@@ -23,9 +25,14 @@ class AddDailyReportDialog extends StatefulWidget {
 }
 
 class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
+  // final _dateKey = GlobalKey();
+  final _dateFocusNode = FocusNode();
   final _dateController = TextEditingController();
+
   final _bodyTempController = TextEditingController();
   final _horseWeightController = TextEditingController();
+
+  bool _isLoading = false;
 
   int? _riderId;
   int? _trainingTypeId;
@@ -44,7 +51,7 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
   final _memoController = TextEditingController();
 
   final List<String> conditionGroupChoices = ["良", "稍重", "重", "不良"];
-  String _conditionGroup = "";
+  String? _conditionGroup;
 
   final _trainingAmountController = TextEditingController();
 
@@ -59,6 +66,7 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
 
     //clone to avoid side effects on original data
     attachedFiles = [..._attachedFiles];
+    _dateFocusNode.requestFocus();
   }
 
   void initFields() {
@@ -69,7 +77,7 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
       _horseWeightController.text = dailyReport.horseWeight.toString();
       _riderId = dailyReport.rider?.id;
       _trainingTypeId = dailyReport.trainingType?.id;
-      _conditionGroup = dailyReport.conditionGroup ?? "";
+      _conditionGroup = dailyReport.conditionGroup;
       _time5fController.text = dailyReport.time5f?.toString() ?? "";
       _time4fController.text = dailyReport.time4f?.toString() ?? "";
       _time3fController.text = dailyReport.time3f?.toString() ?? "";
@@ -101,12 +109,13 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
       return;
     }
 
+    _setLoading(true);
     var getDailyReportResponse = await dailyReportsProvider.addDailyReport(
       horseId: selectedHorse.id!,
       date: _dateController.text,
       bodyTemperature: _bodyTempController.text.parseDoubleOrZero(),
       horseWeight: _horseWeightController.text.parseIntOrZero(),
-      conditionGroup: _conditionGroup,
+      conditionGroup: _conditionGroup ?? "",
       riderId: _riderId,
       trainingTypeId: _trainingTypeId,
       trainingAmount: _trainingAmountController.text,
@@ -119,6 +128,7 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
       uploadedFiles: _uploadedFiles,
       id: widget.dailyReport?.id,
     );
+    _setLoading(false);
 
     MetaResponse metaResponse = getDailyReportResponse.metaResponse;
 
@@ -147,6 +157,7 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
             height: 16,
           ),
           InbloDatePickerField(
+            focusNode: _dateFocusNode,
             pickerAdapter: DateTimePickerAdapter(
               maxValue: DateTime.now(),
             ),
@@ -157,6 +168,8 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
               print(selectedDate);
             },
             controller: _dateController,
+
+            // focusNode: _dateFocusNode,
             textHint: "日付*", // date
             isRequired: true,
           ),
@@ -187,6 +200,13 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
             inputFormatters: [
               FilteringTextInputFormatter.deny(RegExp(r'\.\d*'))
             ],
+            validator: ((value) {
+              if (value != null && value.isNotEmpty) {
+                if (!AppConstants.wholeNumberRegX.hasMatch(value)) {
+                  return "Invalid Weight Format.";
+                }
+              }
+            }),
           ),
           SizedBox(
             height: 12,
@@ -213,7 +233,7 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
                   _riderId = null;
                 }
               },
-              items: dailyReports.riderOptions
+              items: [DropdownData(), ...dailyReports.riderOptions]
                   .map((r) => DropdownMenuItem(
                         value: r.id,
                         child: Text(r.name ?? ""),
@@ -235,7 +255,7 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
                   _trainingTypeId = null;
                 }
               },
-              items: dailyReports.trainingTypeOptions
+              items: [DropdownData(), ...dailyReports.trainingTypeOptions]
                   .map((t) => DropdownMenuItem(
                         value: t.id,
                         child: Text(t.name ?? ""),
@@ -272,6 +292,13 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
                   textHint: "5F",
                   inputType: TextInputType.number,
                   controller: _time5fController,
+                  validator: ((value) {
+                    if (value != null && value.isNotEmpty) {
+                      if (!AppConstants.wholeAndDecimalRegX.hasMatch(value)) {
+                        return "Invalid value.";
+                      }
+                    }
+                  }),
                 ),
               ),
               SizedBox(
@@ -282,6 +309,13 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
                   textHint: "4F",
                   inputType: TextInputType.number,
                   controller: _time4fController,
+                  validator: ((value) {
+                    if (value != null && value.isNotEmpty) {
+                      if (!AppConstants.wholeAndDecimalRegX.hasMatch(value)) {
+                        return "Invalid value.";
+                      }
+                    }
+                  }),
                 ),
               ),
               SizedBox(
@@ -292,6 +326,13 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
                   textHint: "3F",
                   inputType: TextInputType.number,
                   controller: _time3fController,
+                  validator: ((value) {
+                    if (value != null && value.isNotEmpty) {
+                      if (!AppConstants.wholeAndDecimalRegX.hasMatch(value)) {
+                        return "Invalid value.";
+                      }
+                    }
+                  }),
                 ),
               ),
             ],
@@ -308,6 +349,7 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
             height: 16,
           ),
           AttachmentsBox(
+            viewDir: AttachmentDir.dailyReports,
             attachedFiles: currentAndUploadedFiles,
             onCaptureImage: (attachedFile) {
               setState(() {
@@ -333,12 +375,34 @@ class _AddDailyReportDialogState extends State<AddDailyReportDialog> {
           SizedBox(
             height: 10,
           ),
-          InbloTextButton(
-              onPressed: () => _addDailyReport(context),
-              title: "＋ 追加",
-              textStyle: TextStyleInbloButton.big)
+          _isLoading
+              ? CircularProgressIndicator()
+              : InbloTextButton(
+                  onPressed: () => _addDailyReport(context),
+                  title: "＋ 追加",
+                  textStyle: TextStyleInbloButton.big)
         ],
       ),
     );
+  }
+
+  void _setLoading(bool state) {
+    setState(() {
+      _isLoading = state;
+    });
+  }
+
+  @override
+  void dispose() {
+    _dateController.dispose();
+    _bodyTempController.dispose();
+    _horseWeightController.dispose();
+    _time5fController.dispose();
+    _time4fController.dispose();
+    _time3fController.dispose();
+    _memoController.dispose();
+    _trainingAmountController.dispose();
+    _dateFocusNode.dispose();
+    super.dispose();
   }
 }

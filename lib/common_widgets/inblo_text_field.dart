@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_picker/flutter_picker.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:inblo_app/constants/app_constants.dart';
 import 'package:intl/intl.dart';
 
@@ -16,8 +17,10 @@ InputDecoration getInputDecoration({
   required BuildContext context,
   required String textHint,
   bool isDense = false,
+  Widget? suffixIcon,
 }) =>
     InputDecoration(
+      suffixIcon: suffixIcon,
       labelText: textHint,
       isDense: isDense,
       alignLabelWithHint: true,
@@ -115,6 +118,12 @@ class InbloTextField extends StatelessWidget {
       autofocus: autofocus,
       inputFormatters: inputFormatters,
       initialValue: initialValue,
+      onSaved: (newValue) {
+        print("on saved fired");
+      },
+      onFieldSubmitted: (value) {
+        print("on field submitted");
+      },
     );
   }
 }
@@ -126,6 +135,8 @@ class InbloDropdownTextField extends StatefulWidget {
   final String? Function(dynamic value)? validator;
   dynamic value;
   final bool? isRequired;
+  final void Function()? onClearValue;
+  final GlobalKey<FormFieldState> _key = GlobalKey<FormFieldState>();
 
   InbloDropdownTextField({
     required this.onChanged,
@@ -134,6 +145,7 @@ class InbloDropdownTextField extends StatefulWidget {
     this.validator,
     this.value,
     this.isRequired = false,
+    this.onClearValue,
   });
 
   @override
@@ -141,24 +153,74 @@ class InbloDropdownTextField extends StatefulWidget {
 }
 
 class _InbloDropdownTextFieldState extends State<InbloDropdownTextField> {
+  bool _isNull = true;
+
   @override
   void initState() {
+    _isNull = widget.value == null;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField(
-      onChanged: widget.onChanged,
+      onChanged: (value) {
+        // if (value == null) {
+        //   setState(() {
+        //     _isNull = true;
+        //   });
+        // } else {
+        //   setState(() {
+        //     _isNull = false;
+        //   });
+        // }
+        widget.onChanged(value);
+      },
       items: widget.items,
       style: inbloTextFieldStyle,
       decoration: getInputDecoration(
-          context: context, textHint: widget.textHint, isDense: true),
+        context: context,
+        textHint: widget.textHint,
+        isDense: true,
+        suffixIcon:
+            // !_isNull
+            false
+                ? Container(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Stack(
+                      children: [
+                        SvgPicture.asset(
+                          "assets/svg/ic-close.svg",
+                          height: 20,
+                          width: 20,
+                        ),
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              // print("clear value");
+                              // widget.onClearValue?.call();
+                              // widget._key.currentState?.reset();
+                            },
+                            borderRadius: BorderRadius.circular(100),
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                : null,
+      ),
       validator: (value) {
         if (widget.isRequired != null &&
             widget.isRequired! &&
-            value != null &&
-            value.isEmpty) {
+            (value != null && value.isEmpty)) {
           return "This field is required.";
         }
         if (widget.validator != null) {
@@ -174,30 +236,37 @@ class _InbloDropdownTextFieldState extends State<InbloDropdownTextField> {
 class InbloDatePickerField extends StatelessWidget {
   final Function(String selectedDate) onSelectDate;
   final PickerAdapter pickerAdapter;
+  final Key? datepickerKey;
   final String textHint;
   final TextEditingController? controller;
   final String? Function(String? value)? validator;
   final bool? isRequired;
+  final Widget? suffixIcon;
+  final FocusNode? focusNode;
 
-  const InbloDatePickerField(
-      {required this.onSelectDate,
-      required this.pickerAdapter,
-      this.textHint = "- - - - -",
-      this.controller,
-      this.validator,
-      this.isRequired});
+  const InbloDatePickerField({
+    required this.onSelectDate,
+    required this.pickerAdapter,
+    this.datepickerKey,
+    this.textHint = "- - - - -",
+    this.controller,
+    this.validator,
+    this.isRequired,
+    this.suffixIcon,
+    this.focusNode,
+  });
 
-  showPickerDate(
+  void showPickerDate(
       BuildContext context,
       Function(Picker picker, List value) onConfirm,
       PickerAdapter pickerAdapter) {
     Picker(
-            hideHeader: true,
-            adapter: pickerAdapter,
-            title: Text("Select Date"),
-            selectedTextStyle: TextStyle(color: colorPrimary),
-            onConfirm: onConfirm)
-        .showDialog(context);
+      hideHeader: true,
+      adapter: pickerAdapter,
+      title: Text("Select Date"),
+      selectedTextStyle: TextStyle(color: colorPrimary),
+      onConfirm: onConfirm,
+    ).showDialog(context);
 
     // print(dateSelected as DateTimePickerAdapter));
   }
@@ -205,34 +274,47 @@ class InbloDatePickerField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-        onTap: () {
-          showPickerDate(context, (picker, value) {
-            var selected = (picker.adapter as DateTimePickerAdapter).value;
-            var dateFormat = AppConstants.dateOnlyFormatYmd;
-            if (selected != null) {
-              var formattedDateString = DateFormat(dateFormat).format(selected);
-              onSelectDate(formattedDateString);
-            }
-          }, pickerAdapter);
-        },
-        style: inbloTextFieldStyle,
-        readOnly: true,
-        decoration: getInputDecoration(context: context, textHint: textHint),
-        // textAlign: TextAlign.left,
-        controller: controller,
-        // textAlignVertical: TextAlignVertical.top,
-        validator: (value) {
-          if (isRequired != null &&
-              isRequired! &&
-              value != null &&
-              value.isEmpty) {
-            return "This field is required.";
+      onSaved: (newValue) {
+        print("on saved fired");
+      },
+      onFieldSubmitted: (value) {
+        print("on field submitted");
+      },
+      onTap: () {
+        showPickerDate(context, (picker, value) {
+          var selected = (picker.adapter as DateTimePickerAdapter).value;
+          var dateFormat = AppConstants.dateOnlyFormatYmd;
+          if (selected != null) {
+            var formattedDateString = DateFormat(dateFormat).format(selected);
+            onSelectDate(formattedDateString);
           }
-          if (validator != null) {
-            return validator!(value);
-          }
-          return null;
-        });
+        }, pickerAdapter);
+      },
+      key: datepickerKey,
+      style: inbloTextFieldStyle,
+      readOnly: true,
+      decoration: getInputDecoration(
+        context: context,
+        textHint: textHint,
+        suffixIcon: suffixIcon,
+      ),
+      // textAlign: TextAlign.left,
+      controller: controller,
+      // textAlignVertical: TextAlignVertical.top,
+      validator: (value) {
+        if (isRequired != null &&
+            isRequired! &&
+            value != null &&
+            value.isEmpty) {
+          return "This field is required.";
+        }
+        if (validator != null) {
+          return validator!(value);
+        }
+        return null;
+      },
+      focusNode: focusNode,
+    );
   }
 }
 

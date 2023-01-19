@@ -23,6 +23,7 @@ class _SignInScreenState extends State<SignInScreen> {
   late FocusNode _passwordFn;
 
   final _form = GlobalKey<FormState>();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -61,8 +62,10 @@ class _SignInScreenState extends State<SignInScreen> {
       return;
     }
 
+    _setLoading(true);
     var loginResponse = await authProvider.loginUser(
         _usernameController.text, _passwordController.text);
+    _setLoading(false);
 
     scaffoldMessenger.showSnackBar(
         SnackBar(content: Text(loginResponse.metaResponse.message)));
@@ -71,6 +74,12 @@ class _SignInScreenState extends State<SignInScreen> {
       contextNavigator.pushReplacement(
           MaterialPageRoute(builder: (ctx) => MainDashboardScreen()));
     }
+  }
+
+  void _setLoading(bool state) {
+    setState(() {
+      _isLoading = state;
+    });
   }
 
   @override
@@ -119,14 +128,16 @@ class _SignInScreenState extends State<SignInScreen> {
                     isRequired: true,
                   ),
                   SizedBox(height: 24),
-                  InbloTextButton(
-                    onPressed: () {
-                      handleLogin(
-                          authProvider, scaffoldMessenger, contextNavigator);
-                    },
-                    title: "サインイン",
-                    textStyle: TextStyleInbloButton.big,
-                  ),
+                  _isLoading
+                      ? CircularProgressIndicator()
+                      : InbloTextButton(
+                          onPressed: () {
+                            handleLogin(authProvider, scaffoldMessenger,
+                                contextNavigator);
+                          },
+                          title: "サインイン",
+                          textStyle: TextStyleInbloButton.big,
+                        ),
                   SizedBox(height: 16),
                   GestureDetector(
                     onTap: () {

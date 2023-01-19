@@ -7,12 +7,15 @@ import 'package:flutter_web_frame/flutter_web_frame.dart';
 import 'package:inblo_app/features/auth/providers/auth.dart';
 import 'package:inblo_app/features/horse_list/providers/persons_in_charge.dart';
 import 'package:inblo_app/features/horse_list/providers/horses.dart';
+import 'package:inblo_app/features/messages/provider/messages.dart';
 import 'package:inblo_app/features/tab_daily_reports/providers/daily_reports.dart';
 import 'package:inblo_app/features/tab_treatments/providers/treatments.dart';
 import 'package:inblo_app/home_screen.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 import './constants/app_theme.dart' as app_theme;
+import 'features/calendar/provider/calendar_events.dart';
 
 void main() async {
   setupEnv();
@@ -22,8 +25,18 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
+  await initializeDateFormatting();
+
   runApp(const MyApp());
 }
+
+const Set<PointerDeviceKind> _kTouchLikeDeviceTypes = <PointerDeviceKind>{
+  PointerDeviceKind.touch,
+  PointerDeviceKind.mouse,
+  PointerDeviceKind.stylus,
+  PointerDeviceKind.invertedStylus,
+  PointerDeviceKind.unknown
+};
 
 class MyApp extends StatelessWidget {
   const MyApp({
@@ -39,25 +52,45 @@ class MyApp extends StatelessWidget {
           create: (ctx) => Auth(),
         ),
         ChangeNotifierProvider(
-          create: (ctx) => PersonsInCharge(),
+          create: (ctx) => Users(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => CalendarEvents(),
         ),
         ChangeNotifierProvider(
           create: (ctx) => Horses(),
         ),
+        ChangeNotifierProvider(
+          create: (ctx) => Messages(),
+        ),
         ChangeNotifierProxyProvider<Horses, DailyReports>(
           create: (context) => DailyReports(null),
-          update: (context, horses, previousDailyReports) =>
-              DailyReports(horses.selectedHorse),
+          update: (context, horses, previousDailyReports) {
+            DailyReports drProvider = DailyReports(horses.selectedHorse);
+            drProvider
+                .setDailyReports(previousDailyReports?.dailyReports ?? []);
+            return drProvider;
+          },
         ),
         ChangeNotifierProxyProvider<Horses, Treatments>(
           create: (context) => Treatments(null),
-          update: (context, horses, previousTreatments) =>
-              Treatments(horses.selectedHorse),
+          update: (context, horses, previousTreatments) {
+            Treatments trProvider = Treatments(horses.selectedHorse);
+            trProvider.setTreatments(previousTreatments?.treatments ?? []);
+            return trProvider;
+          },
         )
       ],
+      // child: MaterialApp(
+      //   title: 'Inblo',
+      //   theme: app_theme.themeData,
+      //   home: HomeScreen(),
+      // ),
       child: FlutterWebFrame(
-        maximumSize: Size(424, 812),
+        maximumSize: Size(500, 812),
         builder: (ctx) => MaterialApp(
+          scrollBehavior: const MaterialScrollBehavior()
+              .copyWith(scrollbars: true, dragDevices: _kTouchLikeDeviceTypes),
           title: 'Inblo',
           theme: app_theme.themeData,
           home: HomeScreen(),

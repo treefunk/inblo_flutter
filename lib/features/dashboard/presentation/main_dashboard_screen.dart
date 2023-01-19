@@ -6,6 +6,7 @@ import 'package:inblo_app/constants/app_theme.dart';
 import 'package:inblo_app/features/calendar/presentation/calendar_screen.dart';
 import 'package:inblo_app/features/dashboard/presentation/widgets/inblo_app_bar.dart';
 import 'package:inblo_app/features/dashboard/presentation/widgets/side_navigation_drawer.dart';
+import 'package:inblo_app/features/dashboard/responsive/responsive_layout.dart';
 import 'package:inblo_app/features/horse_details/presentation/horse_details_screen.dart';
 import 'package:inblo_app/features/horse_list/presentation/horse_archived_screen.dart';
 import 'package:inblo_app/features/horse_list/presentation/horse_list_screen.dart';
@@ -13,6 +14,8 @@ import 'package:inblo_app/features/horse_list/providers/horses.dart';
 import 'package:inblo_app/features/messages/presentation/messages_screen.dart';
 import 'package:inblo_app/models/horse.dart';
 import 'package:provider/provider.dart';
+
+import 'widgets/app_bottom_nav_bar.dart';
 
 // import '../auth/presentation/sign_up_screen.dart';
 
@@ -210,23 +213,65 @@ class _InbloScaffoldWithBottomNavState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      // body: _pages[_selectedPageIndex]['page'] as Widget,
-      body: widget.child,
-      appBar: InbloAppBar(scaffoldKey: _scaffoldKey),
-      endDrawer: SideNavigationDrawer(),
-      resizeToAvoidBottomInset: false,
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        unselectedItemColor: colorPrimaryDark,
-        selectedItemColor: colorPrimaryDark,
-        currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        items: widget.tabs,
-        onTap: (index) => _onItemTapped(context, index),
+    return ResponsiveLayout(
+      mobileScaffold: Scaffold(
+        key: _scaffoldKey,
+        // body: _pages[_selectedPageIndex]['page'] as Widget,
+        body: widget.child,
+        appBar: InbloAppBar(scaffoldKey: _scaffoldKey),
+        endDrawer: SideNavigationDrawer(),
+        resizeToAvoidBottomInset: false,
+        bottomNavigationBar: AppBottomNavBar(
+          currentIndex: _currentIndex,
+          items: widget.tabs,
+          onTap: (index) => _onItemTapped(context, index),
+        ),
+      ),
+      tabletScaffold: Scaffold(
+        key: _scaffoldKey,
+        // body: _pages[_selectedPageIndex]['page'] as Widget,
+        body: widget.child,
+        appBar: InbloAppBar(scaffoldKey: _scaffoldKey),
+        endDrawer: SideNavigationDrawer(),
+        resizeToAvoidBottomInset: false,
+        bottomNavigationBar: AppBottomNavBar(
+          currentIndex: _currentIndex,
+          items: widget.tabs,
+          onTap: (index) => _onItemTapped(context, index),
+        ),
+      ),
+      desktopScaffold: Scaffold(
+        key: _scaffoldKey,
+        // body: _pages[_selectedPageIndex]['page'] as Widget,
+        body: Row(
+          children: [
+            // SideNavigationDrawer(),
+            NavigationRail(
+              selectedIndex: _currentIndex,
+              destinations: widget.tabs
+                  .map((t) => NavigationRailDestination(
+                      icon: t.icon, label: Text(t.label ?? "")))
+                  .toList(),
+              onDestinationSelected: (index) => _onItemTapped(context, index),
+              // labelType: NavigationRailLabelType.all,
+              // trailing: Flexible(
+              //   child: SideNavigationDrawer(),
+              // ),
+            ),
+            AspectRatio(
+              aspectRatio: 1 / 1.1,
+              child: widget.child,
+            )
+          ],
+        ),
+        // appBar: InbloAppBar(scaffoldKey: _scaffoldKey),
+        // endDrawer: SideNavigationDrawer(),
+        // resizeToAvoidBottomInset: false,
+        // bottomNavigationBar: AppBottomNavBar(
+        //   currentIndex: _currentIndex,
+        //   items: widget.tabs,
+        //   onTap: (index) => _onItemTapped(context, index),
+        // ),
       ),
     );
   }

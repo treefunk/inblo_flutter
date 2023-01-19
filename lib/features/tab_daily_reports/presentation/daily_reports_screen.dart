@@ -11,6 +11,28 @@ import 'package:inblo_app/util/inblo_desktop_scroll_behavior.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:provider/provider.dart';
 
+enum DailyReportColumns {
+  editDeleteButtons("", "", 50.0),
+  date("date", "日付", 100.0),
+  temperature("body_temperature", "体温", 100.0),
+  horseWeight("horse_weight", "馬体重", 100.0),
+  conditionGroup("condition_group", "馬場状態", 100.0),
+  rider("rider", "乗り手", 100.0),
+  trainingType("training_type", "調教内容", 100.0),
+  trainingAmount("training_amount", "調教量", 100.0),
+  time_5f("5f_time", "5F", 100.0),
+  time_4f("4f_time", "4F", 100.0),
+  time_3f("3f_time", "3F", 100.0),
+  notes("memo", "メモ", 100.0),
+  attachments("attachments", "添付ファイル", 100.0);
+
+  final String field;
+  final String label;
+  final double width;
+
+  const DailyReportColumns(this.field, this.label, this.width);
+}
+
 class DailyReportsScreen extends StatefulWidget {
   const DailyReportsScreen({
     super.key,
@@ -26,6 +48,16 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
   late ScrollController _dataTableScrollController;
 
   late final Future getDailyReportsFuture;
+
+  List<DailyReportColumns> _getActiveColumns(List<String> hiddenColumns) {
+    List<DailyReportColumns> columns = [];
+    for (var col in DailyReportColumns.values) {
+      if (!hiddenColumns.contains(col.field)) {
+        columns.add(col);
+      }
+    }
+    return columns;
+  }
 
   @override
   void initState() {
@@ -61,8 +93,11 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
                 child: Text("Something went wrong. Please try again."),
               );
             } else {
-              var dailyReports = context.watch<DailyReports>().dailyReports;
+              var dailyReportsProvider = context.watch<DailyReports>();
+              var dailyReports = dailyReportsProvider.dailyReports;
+              var hiddenColumns = dailyReportsProvider.hiddenColumns;
 
+              print(hiddenColumns);
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -111,19 +146,23 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
                           child: Row(
                             children: [
                               SizedBox(width: 50),
-                              TableColumnLabel(title: "日付"), //date
-                              TableColumnLabel(title: "体温"), //temperature
-                              TableColumnLabel(title: "馬体重"), // weight
-                              TableColumnLabel(
-                                  title: "馬場状態"), // condition group
-                              TableColumnLabel(title: "乗り手"), // rider name
-                              TableColumnLabel(title: "調教内容"), // training type
-                              TableColumnLabel(title: "調教量"), // training amount
-                              TableColumnLabel(title: "5F"),
-                              TableColumnLabel(title: "4F"),
-                              TableColumnLabel(title: "3F"),
-                              TableColumnLabel(title: "メモ"), // notes/memo
-                              TableColumnLabel(title: "添付ファイル"), // attachments
+                              ..._getActiveColumns(hiddenColumns).map(
+                                (col) => TableColumnLabel(title: col.label),
+                              )
+                              // TableColumnLabel(title: "日付"), //date
+                              // TableColumnLabel(title: "体温"), //temperature
+                              // TableColumnLabel(title: "馬体重"), // weight
+                              // TableColumnLabel(
+                              //     title: "馬場状態"), // condition group
+                              // TableColumnLabel(title: "乗り手"), // rider name
+                              // TableColumnLabel(title: "調教内容"), // training type
+                              // TableColumnLabel(title: "調教量"), // training amount
+                              // TableColumnLabel(title: "5F"),
+                              // TableColumnLabel(title: "4F"),
+                              // TableColumnLabel(title: "3F"),
+                              // TableColumnLabel(title: "メモ"), // notes/memo
+                              ,
+                              // TableColumnLabel(title: "添付ファイル"), // attachments
                             ],
                           ),
                         ),
@@ -139,7 +178,10 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
                           physics: BouncingScrollPhysics(),
                           child: Container(
                               // height: constraints.maxHeight
-                              width: 1266,
+
+                              width: 66 +
+                                  ((DailyReportColumns.values.length * 100) -
+                                      (hiddenColumns.length * 100)),
                               margin: EdgeInsets.symmetric(horizontal: 8),
                               color: Colors.white,
                               child: ListView.builder(
@@ -148,6 +190,7 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
                                 itemCount: dailyReports.length,
                                 itemBuilder: ((ctx, index) => ItemDailyReport(
                                       dailyReport: dailyReports[index],
+                                      hiddenColumns: hiddenColumns,
                                     )),
                               )),
                         ),
@@ -211,12 +254,14 @@ class _DailyReportsScreenState extends State<DailyReportsScreen> {
 // }
 
 class ItemDailyReport extends StatefulWidget {
-  const ItemDailyReport({
+  ItemDailyReport({
     required this.dailyReport,
+    required this.hiddenColumns,
     Key? key,
   }) : super(key: key);
 
   final DailyReport dailyReport;
+  final List<String> hiddenColumns;
 
   @override
   State<ItemDailyReport> createState() => _ItemDailyReportState();
@@ -233,6 +278,10 @@ class _ItemDailyReportState extends State<ItemDailyReport> {
         listen: false,
       ).removeDailyReport(dailyReportId);
     }
+  }
+
+  bool _ifNotFiltered(String field) {
+    return !widget.hiddenColumns.contains(field);
   }
 
   @override
@@ -293,29 +342,38 @@ class _ItemDailyReportState extends State<ItemDailyReport> {
               ],
             ),
           ),
-
-          TableValueLabel(
-              title: widget.dailyReport.formattedDate?.toString() ?? ""), //date
-          TableValueLabel(
-              title: widget.dailyReport.bodyTemperature?.toString() ??
-                  ""), //temperature
-          TableValueLabel(
-              title:
-                  widget.dailyReport.horseWeight?.toString() ?? ""), // weight
-          TableValueLabel(
-              title: widget.dailyReport.conditionGroup!), // condition group
-          TableValueLabel(
-              title: widget.dailyReport.rider?.name ?? ""), // rider name
-          TableValueLabel(
-              title:
-                  widget.dailyReport.trainingType?.name ?? ""), // training type
-          TableValueLabel(
-              title:
-                  widget.dailyReport.trainingAmount ?? ""), // training amount
-          TableValueLabel(title: widget.dailyReport.time5f?.toString() ?? ""),
-          TableValueLabel(title: widget.dailyReport.time4f?.toString() ?? ""),
-          TableValueLabel(title: widget.dailyReport.time3f?.toString() ?? ""),
-          TableValueLabel(title: widget.dailyReport.memo ?? ""), // notes/memo
+          if (_ifNotFiltered("date"))
+            TableValueLabel(
+                title:
+                    widget.dailyReport.formattedDate?.toString() ?? ""), //date
+          if (_ifNotFiltered("body_temperature"))
+            TableValueLabel(
+                title: widget.dailyReport.bodyTemperature?.toString() ??
+                    ""), //temperature
+          if (_ifNotFiltered("horse_weight"))
+            TableValueLabel(
+                title: widget.dailyReport.horseWeight?.toString() ?? ""),
+          if (_ifNotFiltered("condition_group"))
+            // weight
+            TableValueLabel(
+                title: widget.dailyReport.conditionGroup!), // condition group
+          if (_ifNotFiltered("rider"))
+            TableValueLabel(
+                title: widget.dailyReport.rider?.name ?? ""), // rider name
+          if (_ifNotFiltered("training_type"))
+            TableValueLabel(
+                title: widget.dailyReport.trainingType?.name ??
+                    ""), // training type
+          if (_ifNotFiltered("training_amount"))
+            TableValueLabel(title: widget.dailyReport.trainingAmount ?? ""),
+          if (_ifNotFiltered("5f_time"))
+            TableValueLabel(title: widget.dailyReport.time5f?.toString() ?? ""),
+          if (_ifNotFiltered("4f_time"))
+            TableValueLabel(title: widget.dailyReport.time4f?.toString() ?? ""),
+          if (_ifNotFiltered("3f_time"))
+            TableValueLabel(title: widget.dailyReport.time3f?.toString() ?? ""),
+          if (_ifNotFiltered("memo"))
+            TableValueLabel(title: widget.dailyReport.memo ?? ""), // notes/memo
           if (widget.dailyReport.attachedFiles != null &&
               widget.dailyReport.attachedFiles!.isNotEmpty)
             GestureDetector(

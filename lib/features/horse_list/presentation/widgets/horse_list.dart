@@ -39,17 +39,21 @@ class _HorseListState extends State<HorseList> {
 
   @override
   void initState() {
-    fetchHorsesFuture =
-        Provider.of<Horses>(context, listen: false).fetchHorses();
+    initHorses();
 
     super.initState();
+  }
+
+  void initHorses() {
+    fetchHorsesFuture =
+        Provider.of<Horses>(context, listen: false).fetchHorses();
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: fetchHorsesFuture,
-        builder: (context, snapshot) {
+        builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Expanded(
               child: Center(

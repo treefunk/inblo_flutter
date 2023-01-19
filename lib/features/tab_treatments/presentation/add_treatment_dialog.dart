@@ -3,6 +3,7 @@ import 'package:flutter_picker/Picker.dart';
 import 'package:inblo_app/common_widgets/general_dialog.dart';
 import 'package:inblo_app/common_widgets/inblo_text_button.dart';
 import 'package:inblo_app/common_widgets/inblo_text_field.dart';
+import 'package:inblo_app/constants/app_constants.dart';
 import 'package:inblo_app/features/horse_details/file_attachments/attachments_box.dart';
 import 'package:inblo_app/models/attached_file.dart';
 import 'package:inblo_app/models/meta_response.dart';
@@ -21,6 +22,7 @@ class AddTreatmentDialog extends StatefulWidget {
 }
 
 class _AddTreatmentDialogState extends State<AddTreatmentDialog> {
+  final _dateFocusNode = FocusNode();
   final _dateController = TextEditingController();
 
   final List<String> occasionTypeChoice = [
@@ -31,7 +33,7 @@ class _AddTreatmentDialogState extends State<AddTreatmentDialog> {
     "飼い葉",
     "その他"
   ];
-  String _occasionType = "";
+  String? _occasionType;
 
   final _injuredPartcontroller = TextEditingController();
   final _treatmentDetailController = TextEditingController();
@@ -40,6 +42,8 @@ class _AddTreatmentDialogState extends State<AddTreatmentDialog> {
   final _notesController = TextEditingController();
 
   final _form = GlobalKey<FormState>();
+
+  bool _isLoading = false;
 
   List<AttachedFile> _attachedFiles = [];
   late List<AttachedFile> attachedFiles;
@@ -52,12 +56,13 @@ class _AddTreatmentDialogState extends State<AddTreatmentDialog> {
   @override
   void initState() {
     super.initState();
-    print("init add treatment");
 
     initFields();
 
     //clone to avoid side effects on original data
     attachedFiles = [..._attachedFiles];
+
+    _dateFocusNode.requestFocus();
   }
 
   void initFields() {
@@ -95,13 +100,14 @@ class _AddTreatmentDialogState extends State<AddTreatmentDialog> {
 
     if (selectedHorse == null) return;
 
+    _setLoading(true);
     var getTreatmentResponse = await treatmentsProvider.addTreatment(
       horseId: selectedHorse.id!,
       date: _dateController.text,
       vetName: _vetNameController.text,
       treatmentDetail: _treatmentDetailController.text,
       injuredPart: _injuredPartcontroller.text,
-      occasionType: _occasionType,
+      occasionType: _occasionType ?? "",
       medicineName: _drugNameController.text,
       memo: _notesController.text,
       treatmentAttachedIds:
@@ -109,6 +115,7 @@ class _AddTreatmentDialogState extends State<AddTreatmentDialog> {
       uploadedFiles: _uploadedFiles,
       id: widget.treatment?.id,
     );
+    _setLoading(false);
 
     MetaResponse metaResponse = getTreatmentResponse.metaResponse;
 
@@ -147,6 +154,7 @@ class _AddTreatmentDialogState extends State<AddTreatmentDialog> {
             controller: _dateController,
             textHint: "日付*", // date
             isRequired: true,
+            focusNode: _dateFocusNode,
           ),
           SizedBox(
             height: 16,
@@ -158,9 +166,10 @@ class _AddTreatmentDialogState extends State<AddTreatmentDialog> {
             items: ["", ...occasionTypeChoice]
                 .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                 .toList(),
-            textHint: "分類*", // condition group
+            textHint: "分類*", // Occasion Type
             value: _occasionType,
             isRequired: true,
+            validator: AppConstants.requireCallback,
           ),
           SizedBox(
             height: 16,
@@ -202,6 +211,7 @@ class _AddTreatmentDialogState extends State<AddTreatmentDialog> {
             height: 16,
           ),
           AttachmentsBox(
+            viewDir: AttachmentDir.treatments,
             attachedFiles: currentAndUploadedFiles,
             onCaptureImage: (attachedFile) {
               setState(() {
@@ -227,12 +237,32 @@ class _AddTreatmentDialogState extends State<AddTreatmentDialog> {
           SizedBox(
             height: 10,
           ),
-          InbloTextButton(
-              onPressed: () => _addTreatment(context),
-              title: "＋ 追加",
-              textStyle: TextStyleInbloButton.big)
+          _isLoading
+              ? CircularProgressIndicator()
+              : InbloTextButton(
+                  onPressed: () => _addTreatment(context),
+                  title: "＋ 追加",
+                  textStyle: TextStyleInbloButton.big)
         ],
       ),
     );
+  }
+
+  void _setLoading(bool state) {
+    setState(() {
+      _isLoading = state;
+    });
+  }
+
+  @override
+  void dispose() {
+    _dateFocusNode.dispose();
+    _dateController.dispose();
+    _injuredPartcontroller.dispose();
+    _treatmentDetailController.dispose();
+    _vetNameController.dispose();
+    _drugNameController.dispose();
+    _notesController.dispose();
+    super.dispose();
   }
 }

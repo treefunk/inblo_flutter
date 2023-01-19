@@ -19,6 +19,10 @@ class Treatments with ChangeNotifier {
 
   List<Treatment> _treatments = [];
 
+  void setTreatments(List<Treatment> treatments) {
+    _treatments = treatments;
+  }
+
   List<Treatment> get treatments {
     return [..._treatments];
   }

@@ -23,8 +23,7 @@ class _HorseListScreenState extends State<HorseListScreen> {
 
   @override
   void initState() {
-    getUsersFuture = Provider.of<PersonsInCharge>(context, listen: false)
-        .initPersonInCharge();
+    getUsersFuture = Provider.of<Users>(context, listen: false).fetchUsers();
     super.initState();
   }
 

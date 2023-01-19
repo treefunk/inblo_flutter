@@ -9,6 +9,8 @@ import 'package:inblo_app/models/attached_file.dart';
 
 import '../../../common_widgets/general_dialog.dart';
 
+enum AttachmentDir { dailyReports, treatments }
+
 class AttachmentsBox extends StatefulWidget {
   AttachmentsBox({
     super.key,
@@ -17,6 +19,7 @@ class AttachmentsBox extends StatefulWidget {
     required this.onPickFile,
     required this.onDeleteExisting,
     required this.onDeleteUploaded,
+    required this.viewDir,
   });
 
   List<AttachedFile> attachedFiles;
@@ -25,6 +28,7 @@ class AttachmentsBox extends StatefulWidget {
   Function(AttachedFile attachedFile) onPickFile;
   Function(int index) onDeleteExisting;
   Function(int index) onDeleteUploaded;
+  AttachmentDir viewDir;
 
   @override
   State<AttachmentsBox> createState() => _AttachmentsBoxState();
@@ -124,8 +128,12 @@ class _AttachmentsBoxState extends State<AttachmentsBox> {
                             showCustomDialog(
                               context: context,
                               title: "",
-                              content: (ctx) => AttachedDialog.fromDailyReport(
-                                  [widget.attachedFiles[i]]),
+                              content: (ctx) =>
+                                  (widget.viewDir == AttachmentDir.dailyReports)
+                                      ? AttachedDialog.fromDailyReport(
+                                          [widget.attachedFiles[i]])
+                                      : AttachedDialog.fromTreatments(
+                                          [widget.attachedFiles[i]]),
                             );
                           },
                           child: Row(children: [

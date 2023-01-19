@@ -7,6 +7,7 @@ import 'package:inblo_app/models/user_details.dart';
 import 'package:inblo_app/util/preference_utils.dart';
 
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SideNavigationDrawer extends StatefulWidget {
   const SideNavigationDrawer({
@@ -38,6 +39,15 @@ class _SideNavigationDrawerState extends State<SideNavigationDrawer> {
     }
   }
 
+  void goToInfoPage() async {
+    const url = "https://www.keiba.go.jp/KeibaWeb/DataRoom/DataRoomTop";
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
+    } else {
+      // can't launch url
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -47,7 +57,7 @@ class _SideNavigationDrawerState extends State<SideNavigationDrawer> {
           // crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             AppBar(
-              toolbarHeight: 80,
+              // toolbarHeight: 80,
               backgroundColor: colorPrimary,
               title: ListTile(
                 title: Text(
@@ -78,7 +88,9 @@ class _SideNavigationDrawerState extends State<SideNavigationDrawer> {
                 // size: 30,
               ),
               title: Text('地方競馬情報サイト'),
-              onTap: () {},
+              onTap: () {
+                goToInfoPage();
+              },
             ),
             ListTile(
               leading: Icon(

@@ -8,6 +8,11 @@ void showCustomDialog({
   required BuildContext context,
   required String title,
   required Widget? Function(BuildContext context) content,
+  bool clearHeaders = false,
+  double verticalPadding = 12,
+  double horizontalPadding = 24,
+  double containerPadding = 10,
+  void Function()? onClose,
 }) {
   showGeneralDialog(
     context: context,
@@ -30,8 +35,7 @@ void showCustomDialog({
                 child: Container(
                     // height: 1000,
                     margin: EdgeInsets.symmetric(horizontal: 24, vertical: 34),
-                    padding: EdgeInsets.only(
-                        top: 10, left: 10, right: 10, bottom: 10),
+                    padding: EdgeInsets.all(containerPadding),
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10)),
@@ -40,65 +44,67 @@ void showCustomDialog({
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Spacer(),
-                                Expanded(
-                                  flex: 6,
-                                  child: Text(
-                                    title, // "管理馬の詳細",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontFamily: "Roboto",
-                                        fontWeight: FontWeight.bold,
-                                        color: colorPrimaryDark,
-                                        fontSize: 18),
+                          if (!clearHeaders)
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Spacer(),
+                                  Expanded(
+                                    flex: 6,
+                                    child: Text(
+                                      title, // "管理馬の詳細",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontFamily: "Roboto",
+                                          fontWeight: FontWeight.bold,
+                                          color: colorPrimaryDark,
+                                          fontSize: 18),
+                                    ),
                                   ),
-                                ),
-                                Flexible(
-                                    flex: 1,
-                                    child: Container(
-                                      alignment: Alignment.centerRight,
-                                      child: Stack(
-                                        children: [
-                                          SvgPicture.asset(
-                                            "assets/svg/ic-close.svg",
-                                            height: 35,
-                                            width: 35,
-                                          ),
-                                          Material(
-                                            color: Colors.transparent,
-                                            child: InkWell(
-                                              onTap: () {
-                                                Navigator.of(context,
-                                                        rootNavigator: true)
-                                                    .pop();
-                                              },
-                                              borderRadius:
-                                                  BorderRadius.circular(100),
-                                              child: Container(
-                                                width: 35,
-                                                height: 35,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
+                                  Flexible(
+                                      flex: 1,
+                                      child: Container(
+                                        alignment: Alignment.centerRight,
+                                        child: Stack(
+                                          children: [
+                                            SvgPicture.asset(
+                                              "assets/svg/ic-close.svg",
+                                              height: 35,
+                                              width: 35,
+                                            ),
+                                            Material(
+                                              color: Colors.transparent,
+                                              child: InkWell(
+                                                onTap: () {
+                                                  Navigator.of(context,
+                                                          rootNavigator: true)
+                                                      .pop();
+                                                },
+                                                borderRadius:
+                                                    BorderRadius.circular(100),
+                                                child: Container(
+                                                  width: 35,
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    )),
-                              ],
+                                            )
+                                          ],
+                                        ),
+                                      )),
+                                ],
+                              ),
                             ),
-                          ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 12),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: horizontalPadding,
+                                vertical: verticalPadding),
                             child: content(context),
                           )
                         ],
@@ -110,7 +116,9 @@ void showCustomDialog({
         ),
       );
     },
-  );
+  ).then((value) {
+    onClose?.call();
+  });
 }
 
 Future<void> showOkDialog(

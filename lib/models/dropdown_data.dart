@@ -11,6 +11,8 @@ class DropdownData {
     this.updatedAt,
   });
 
+  // DropdownData.empty({this.id, this.name, this.createdAt, this.updatedAt});
+
   final int? id;
   final String? name;
   final DateTime? createdAt;

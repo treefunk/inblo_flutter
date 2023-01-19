@@ -28,9 +28,15 @@ class DailyReports with ChangeNotifier {
     //
   ];
 
+  void setDailyReports(List<DailyReport> dailyReports) {
+    _dailyReports = dailyReports;
+  }
+
   List<DailyReport> get dailyReports {
     return [..._dailyReports];
   }
+
+  List<String> hiddenColumns = [];
 
   List<DropdownData> _riderOptions = [];
 
@@ -64,6 +70,8 @@ class DailyReports with ChangeNotifier {
 
     if (dailyReportListResponse.metaResponse.code == 200) {
       _dailyReports = dailyReportListResponse.data ?? [];
+      hiddenColumns = dailyReportListResponse.hiddenColumns.split(',');
+      notifyListeners();
     }
   }
 
